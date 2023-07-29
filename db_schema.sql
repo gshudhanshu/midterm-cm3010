@@ -22,9 +22,7 @@ CREATE TABLE host_url (
   host_url_id int NOT NULL AUTO_INCREMENT,
   host_url varchar(255) NULL,
   host_picture_url varchar(255) NULL,
-  host_id int NOT NULL,
   PRIMARY KEY (host_url_id)
---   FOREIGN KEY (host_id) REFERENCES host(host_id),
 );
 
 -- Create the table host_location
@@ -48,8 +46,6 @@ CREATE TABLE host (
   FOREIGN KEY (host_location_id) REFERENCES host_location(host_location_id)
 );
 
--- Alter the table host_url to add the foreign key
-ALTER TABLE host_url ADD FOREIGN KEY (host_id) REFERENCES host(host_id);
 
 -- Create the table neighborhood
 CREATE TABLE neighborhood (
