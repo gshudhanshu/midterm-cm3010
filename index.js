@@ -1,9 +1,10 @@
 const express = require('express')
 const bodyParser = require('body-parser')
 const mysql = require('mysql2')
+const dotenv = require('dotenv')
+dotenv.config()
 
 const app = express()
-const port = 5000
 
 // Body parser middleware
 app.use(bodyParser.json())
@@ -14,10 +15,11 @@ app.set('view engine', 'ejs')
 
 // Setup MySQL Connection
 const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '',
-  database: 'Listing',
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  multipleStatements: true,
 })
 
 // Connect to MySQL
@@ -40,4 +42,4 @@ app.use('/host', host)
 app.use('*', error404Routes)
 
 // Start the server
-app.listen(port, () => console.log(`Server started on port ${port}`))
+app.listen(() => console.log(`Server started on port ${process.env.PORT}`))
