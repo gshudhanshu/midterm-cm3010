@@ -14,13 +14,83 @@ const pool = mysql.createPool({
   multipleStatements: true,
 })
 
-const filterData = (arrayOfObj, keyArr) => {
-  return arrayOfObj.map((obj) =>
-    keyArr.reduce((acc, key) => {
-      acc[key] = obj[key]
-      return acc
-    }, {})
-  )
+const filterData = (arrayOfObj) => {
+  arrayOfobjectSplit = {
+    listing_url: [],
+    host_url: [],
+    host_location: [],
+    neighborhood: [],
+    geo_location: [],
+    property_type: [],
+    room_type: [],
+    amenity: [],
+    review: [],
+    host: [],
+    listing: [],
+  }
+  arrayOfObj.reduce((acc, curr) => {
+    arrayOfobjectSplit.listing_url.push({
+      listing_url: curr.listing_url,
+      picture_url: curr.picture_url,
+    })
+
+    arrayOfobjectSplit.host_url.push({
+      host_url: curr.host_url,
+      host_picture_url: curr.host_picture_url,
+    })
+
+    arrayOfobjectSplit.host_location.push({
+      host_location: curr.host_location,
+    })
+
+    arrayOfobjectSplit.neighborhood.push({
+      neighborhood: curr.neighborhood,
+    })
+
+    arrayOfobjectSplit.geo_location.push({
+      latitude: curr.latitude,
+      longitude: curr.longitude,
+    })
+
+    arrayOfobjectSplit.property_type.push({
+      property_type: curr.property_type,
+    })
+
+    arrayOfobjectSplit.room_type.push({
+      room_type: curr.room_type,
+    })
+
+    arrayOfobjectSplit.amenity.push({
+      amenity: curr.amenity,
+    })
+
+    arrayOfobjectSplit.review.push({
+      number_of_reviews: curr.number_of_reviews,
+      review_scores_rating: curr.review_scores_rating,
+    })
+
+    arrayOfobjectSplit.host.push({
+      host_id: curr.host_id,
+      host_name: curr.host_name,
+      host_about: curr.host_about,
+      host_neighbourhood: curr.host_neighbourhood,
+      host_total_listings_count: curr.host_total_listings_count,
+    })
+
+    arrayOfobjectSplit.listing.push({
+      listing_id: curr.listing_id,
+      name: curr.listing_name,
+      description: curr.description,
+      neighborhood_overview: curr.neighborhood_overview,
+      accommodates: curr.accommodates,
+      bedrooms: curr.bedrooms,
+      beds: curr.beds,
+      bathrooms: curr.bathrooms,
+      availability_365: curr.availability_365,
+      price: curr.price,
+    })
+  })
+  return arrayOfobjectSplit
 }
 
 async function findOrCreateAmenities(amenityValues) {
@@ -102,8 +172,6 @@ async function insertListingAmenityJunction(data) {
 
 async function bulkInsertData(data) {
   // Find or create amenity IDs for each listing
-  // this is executing
-  console.log('one ', data.length)
   let idsArr = {
     amenityIds: [],
     hostLocationIds: [],
@@ -116,9 +184,6 @@ async function bulkInsertData(data) {
     const amenityIds = await findOrCreateAmenities(row.amenities)
     idsArr.amenityIds.push(amenityIds)
   }
-
-  // This is not executing
-  console.log('two ', data.length)
 
   // Find or create IDs for host_location, neighborhood, property_type, room_type, and host
   for (const row of data) {
@@ -157,17 +222,17 @@ async function bulkInsertData(data) {
     filterData(data, ['listing_url', 'picture_url'])
   )
 
-  // // Insert host_url and store generated host_url_id
-  // const hostUrlIds = await insertData(
-  //   'host_url',
-  //   filterData(data, ['host_url', 'host_picture_url'])
-  // )
+  // Insert host_url and store generated host_url_id
+  const hostUrlIds = await insertData(
+    'host_url',
+    filterData(data, ['host_url', 'host_picture_url'])
+  )
 
-  // // Insert review and store generated review_id
-  // const reviewIds = await insertData(
-  //   'review',
-  //   filterData(data, ['number_of_reviews', 'review_scores_rating'])
-  // )
+  // Insert review and store generated review_id
+  const reviewIds = await insertData(
+    'review',
+    filterData(data, ['number_of_reviews', 'review_scores_rating'])
+  )
 
   // const filteredDataForHost = filterData(data, [])
   // // Now insert host and listing tables, using the generated foreign key values
@@ -199,22 +264,7 @@ async function bulkInsertData(data) {
 async function readCSVFile(filePath, chunkSize) {
   let rows = []
   let chunkCount = 0
-  let allChunksProcessed = false
   const allChunks = []
-  currentChunk = {
-    listing_url: [],
-    host_url: [],
-    host_location: [],
-    neighborhood: [],
-    geo_location: [],
-    property_type: [],
-    room_type: [],
-    amenity: [],
-    review: [],
-    host: [],
-    listing: [],
-    listing_amenity_junction: [],
-  }
 
   return new Promise((resolve, reject) => {
     const parser = fs.createReadStream(filePath).pipe(
@@ -228,21 +278,30 @@ async function readCSVFile(filePath, chunkSize) {
       })
     )
 
+    const processChunk = async (chunk) => {
+      try {
+        const splitedChunk = filterData(chunk)
+        await bulkInsertData(chunk)
+        console.log(`Processed ${chunk.length} rows.`)
+        console.log(`Processed chunk ${chunkCount + 1}: ${chunk.length} rows.`)
+        chunkCount++
+      } catch (error) {
+        reject(error)
+      }
+    }
+
     parser.on('data', async (row) => {
       row.amenities = row.amenities.replace(/'/g, '"')
       row.amenities = JSON.parse(row.amenities)
 
       rows.push(row)
+
       if (rows.length === chunkSize) {
         const chunk = rows.splice(0, chunkSize)
         try {
           parser.pause()
-          await bulkInsertData(chunk)
-          console.log(`Processed chunk ${chunkCount}: ${chunkSize} rows.`)
-          chunkCount++
-          rows = []
+          allChunks.push(processChunk(chunk))
           parser.resume()
-          allChunksProcessed = true
         } catch (error) {
           reject(error)
         }
@@ -252,30 +311,22 @@ async function readCSVFile(filePath, chunkSize) {
     parser.on('end', async () => {
       if (rows.length > 0) {
         try {
-          await bulkInsertData(rows)
-          console.log(`Processed chunk ${chunkCount}: ${rows.length} rows.`)
-          chunkCount++
+          await processChunk(rows)
         } catch (error) {
           reject(error)
         }
       }
 
-      // if (allChunksProcessed) {
-      //   console.log(`resolve.`)
-      //   resolve()
-      // }
+      try {
+        await Promise.all(allChunks)
+        resolve()
+      } catch (error) {
+        reject(error)
+      }
     })
 
     parser.on('error', (error) => {
       reject(error)
-    })
-    // parser.on('close', () => {
-    //   resolve()
-    // })
-    parser.on('drain', () => {
-      if (allChunksProcessed) {
-        resolve()
-      }
     })
   })
 }
