@@ -79,7 +79,7 @@ CREATE TABLE room_type (
 -- Create the table amenities
 CREATE TABLE amenity (
   amenity_id int NOT NULL AUTO_INCREMENT,
-  amenity varchar(255) NULL,
+  amenity varchar(255) UNIQUE NULL,
   PRIMARY KEY (amenity_id)
 );
 
@@ -95,13 +95,13 @@ CREATE TABLE review (
 CREATE TABLE listing (
   listing_id int NOT NULL AUTO_INCREMENT,
   name varchar(255) NOT NULL,
-  description varchar(255) NOT NULL,
+  description text(1000) NOT NULL,
   neighborhood_overview text(1000) NOT NULL,
-  accomodates tinyint UNSIGNED NULL,
+  accommodates tinyint UNSIGNED NULL,
   bedrooms tinyint UNSIGNED NULL,
   beds tinyint UNSIGNED NULL,
-  bathrooms tinyint UNSIGNED NULL,
-  availability_365 tinyint UNSIGNED NULL,
+  bathrooms_text varchar(255) NULL,
+  availability_365 int NULL,
   price int NOT NULL,
   listing_url_id int NOT NULL,
   host_id int NOT NULL,
