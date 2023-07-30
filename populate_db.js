@@ -197,8 +197,10 @@ async function bulkInsertData(data) {
 }
 
 async function readCSVFile(filePath, chunkSize) {
-  const rows = []
+  let rows = []
   let chunkCount = 0
+  let allChunksProcessed = false
+  const allChunks = []
   currentChunk = {
     listing_url: [],
     host_url: [],
@@ -234,9 +236,13 @@ async function readCSVFile(filePath, chunkSize) {
       if (rows.length === chunkSize) {
         const chunk = rows.splice(0, chunkSize)
         try {
+          parser.pause()
           await bulkInsertData(chunk)
-          chunkCount++
           console.log(`Processed chunk ${chunkCount}: ${chunkSize} rows.`)
+          chunkCount++
+          rows = []
+          parser.resume()
+          allChunksProcessed = true
         } catch (error) {
           reject(error)
         }
@@ -247,26 +253,36 @@ async function readCSVFile(filePath, chunkSize) {
       if (rows.length > 0) {
         try {
           await bulkInsertData(rows)
-          chunkCount++
           console.log(`Processed chunk ${chunkCount}: ${rows.length} rows.`)
+          chunkCount++
         } catch (error) {
           reject(error)
         }
       }
+
+      // if (allChunksProcessed) {
+      //   console.log(`resolve.`)
+      //   resolve()
+      // }
     })
 
     parser.on('error', (error) => {
       reject(error)
     })
-    parser.on('close', () => {
-      resolve()
+    // parser.on('close', () => {
+    //   resolve()
+    // })
+    parser.on('drain', () => {
+      if (allChunksProcessed) {
+        resolve()
+      }
     })
   })
 }
 
 // Assuming you have the CSV file path and chunk size defined
 const filePath = './csv/listings.csv'
-const chunkSize = 3
+const chunkSize = 4
 
 readCSVFile(filePath, chunkSize)
   .then(() => {
