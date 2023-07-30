@@ -126,7 +126,9 @@ async function findOrCreateAmenities(amenityValues) {
 
 async function findOrCreate(tableName, data, idColumn = false) {
   const keys = Object.keys(data[0])
-  const values = data.map((row) => Object.values(row))
+  const values = data.map((row) =>
+    Object.values(row).map((value) => (value === '' ? null : value))
+  )
 
   const query = `INSERT INTO ${tableName} (${keys.join(', ')}) VALUES ? 
                  ON DUPLICATE KEY UPDATE ${idColumn} = VALUES(${idColumn})`
@@ -165,7 +167,9 @@ async function findOrCreateEntityId(tableName, columnName, value) {
 
 async function insertData(tableName, data, idColumn = false) {
   const keys = Object.keys(data[0])
-  const values = data.map((row) => Object.values(row))
+  const values = data.map((row) =>
+    Object.values(row).map((value) => (value === '' ? null : value))
+  )
 
   const query = `INSERT INTO ${tableName} (${keys.join(', ')}) VALUES ?`
 
@@ -355,7 +359,7 @@ async function readCSVFile(filePath, chunkSize) {
 
 // Assuming you have the CSV file path and chunk size defined
 const filePath = './csv/listings.csv'
-const chunkSize = 100
+const chunkSize = 1000
 
 readCSVFile(filePath, chunkSize)
   .then(() => {
