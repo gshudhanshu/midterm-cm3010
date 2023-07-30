@@ -124,24 +124,27 @@ async function findOrCreateAmenities(amenityValues) {
   return amenityIds
 }
 
-async function findOrCreateHost(hostValues) {
-  const amenityIds = []
-  for (const amenityValue of amenityValues) {
-    const [rows] = await pool.query(
-      'SELECT amenity_id FROM amenity WHERE amenity = ?',
-      [amenityValue]
-    )
-    if (rows.length > 0) {
-      amenityIds.push(rows[0].amenity_id)
-    } else {
-      const [result] = await pool.query(
-        'INSERT INTO amenity (amenity) VALUES (?)',
-        [amenityValue]
-      )
-      amenityIds.push(result.insertId)
+async function findOrCreate(tableName, data, idColumn = false) {
+  const keys = Object.keys(data[0])
+  const values = data.map((row) => Object.values(row))
+
+  const query = `INSERT INTO ${tableName} (${keys.join(', ')}) VALUES ? 
+                 ON DUPLICATE KEY UPDATE ${idColumn} = VALUES(${idColumn})`
+
+  const [result] = await pool.query(query, [values])
+
+  let insertedIds = []
+  if (idColumn) {
+    // Retrieve the IDs of the inserted rows based on the predefined IDs
+    insertedIds = data.map((row) => row[idColumn])
+  } else {
+    // Get the IDs of all inserted rows
+    for (let i = 0; i < result.affectedRows; i++) {
+      insertedIds.push(result.insertId + i)
     }
   }
-  return amenityIds
+
+  return insertedIds
 }
 
 async function findOrCreateEntityId(tableName, columnName, value) {
@@ -251,7 +254,7 @@ async function bulkInsertData(data) {
   const reviewIds = await insertData('review', data.review)
 
   // Now insert host and listing tables, using the generated foreign key values
-  const hostIds = await insertData(
+  const hostIds = await findOrCreate(
     'host',
     data.host.map((row, index) => ({
       ...row,
@@ -261,7 +264,7 @@ async function bulkInsertData(data) {
     'host_id'
   )
 
-  const listingIds = await insertData(
+  const listingIds = await findOrCreate(
     'listing',
     data.listing.map((row, index) => ({
       ...row,
@@ -352,7 +355,7 @@ async function readCSVFile(filePath, chunkSize) {
 
 // Assuming you have the CSV file path and chunk size defined
 const filePath = './csv/listings.csv'
-const chunkSize = 10
+const chunkSize = 100
 
 readCSVFile(filePath, chunkSize)
   .then(() => {

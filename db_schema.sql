@@ -36,11 +36,11 @@ CREATE TABLE host_location (
 CREATE TABLE host (
   host_id int NOT NULL AUTO_INCREMENT,
   host_name varchar(255) NOT NULL,
-  host_about text(1000) NOT NULL,
-  host_neighbourhood varchar(255) NOT NULL,
+  host_about text(1000) NULL,
+  host_neighbourhood varchar(255) NULL,
   host_total_listings_count tinyint UNSIGNED NULL,
   host_url_id int NOT NULL,
-  host_location_id int NOT NULL,
+  host_location_id int NULL,
   PRIMARY KEY (host_id),
   FOREIGN KEY (host_url_id) REFERENCES host_url(host_url_id),
   FOREIGN KEY (host_location_id) REFERENCES host_location(host_location_id)
@@ -86,8 +86,8 @@ CREATE TABLE amenity (
 -- Create the table review
 CREATE TABLE review (
     review_id int NOT NULL AUTO_INCREMENT,
-    number_of_reviews int NOT NULL,
-    review_scores_rating int NOT NULL,
+    number_of_reviews int NULL,
+    review_scores_rating int NULL,
     PRIMARY KEY (review_id)
 );
 
@@ -95,11 +95,11 @@ CREATE TABLE review (
 CREATE TABLE listing (
   listing_id int NOT NULL AUTO_INCREMENT,
   name varchar(255) NOT NULL,
-  description text(1000) NOT NULL,
-  neighborhood_overview text(1000) NOT NULL,
+  description text(1000) NULL,
+  neighborhood_overview text(1000) NULL,
   accommodates tinyint UNSIGNED NULL,
   bedrooms tinyint UNSIGNED NULL,
-  beds tinyint UNSIGNED NULL,
+  beds tinyint UNSIGNED NULL ,
   bathrooms_text varchar(255) NULL,
   availability_365 int NULL,
   price int NOT NULL,
