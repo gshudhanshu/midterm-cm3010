@@ -317,9 +317,10 @@ async function readCSVFile(filePath, chunkSize) {
     }
 
     parser.on('data', async (row) => {
-      row.amenities = row.amenities.replace(/'/g, '"')
+      // row.amenities = row.amenities.replace(/'/g, '"').split(',')
+      // row.amenities = row.amenities.replace(/\[|\]/g, '').split(',')
       row.amenities = JSON.parse(row.amenities)
-
+      // console.log(row.amenities)
       rows.push(row)
 
       if (rows.length === chunkSize) {
@@ -359,7 +360,7 @@ async function readCSVFile(filePath, chunkSize) {
 
 // Assuming you have the CSV file path and chunk size defined
 const filePath = './csv/listings.csv'
-const chunkSize = 1000
+const chunkSize = 500
 
 readCSVFile(filePath, chunkSize)
   .then(() => {
