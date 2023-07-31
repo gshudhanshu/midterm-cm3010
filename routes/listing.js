@@ -7,13 +7,25 @@ const pool = require('../dbconnection')
  */
 router.get('/', async (req, res) => {
   let currPage = parseInt(req.query.currPage) || 1
+  let search = req.query.search || ''
   let offset = 15
+
+  // Search where clause
+  let whereClause = ''
+  if (search) {
+    whereClause = `WHERE name LIKE '%${search}%' OR neighborhood LIKE '%${search}%'`
+  }
+
   let query = `SELECT * FROM listing
-   INNER JOIN listing_url ON listing.listing_url_id = listing_url.listing_url_id
-   LIMIT ${offset} OFFSET ${(currPage - 1) * offset}`
+               INNER JOIN listing_url ON listing.listing_url_id = listing_url.listing_url_id
+               INNER JOIN neighborhood ON neighborhood.neighborhood_id = listing.neighborhood_id
+               ${whereClause}
+               LIMIT ${offset} OFFSET ${(currPage - 1) * offset}`
 
   // Query to get the total count of records in the `listing` table
-  let countQuery = `SELECT COUNT(*) as total FROM listing`
+  let countQuery = `SELECT COUNT(*) as total FROM listing
+                    INNER JOIN neighborhood ON listing.neighborhood_id = neighborhood.neighborhood_id
+                    ${whereClause}`
 
   pool.query(countQuery, (err, countResult) => {
     if (err) throw err
@@ -23,6 +35,7 @@ router.get('/', async (req, res) => {
       if (err) throw err
       res.render('listings', {
         listings: result,
+        search,
         pagination: {
           currPage: currPage,
           perPage: offset,
