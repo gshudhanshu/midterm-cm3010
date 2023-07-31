@@ -1,4 +1,4 @@
-body {
+/* body {
   background-color: black;
   font-family: 'Poppins', sans-serif;
   min-height: 100vh;
@@ -48,8 +48,6 @@ body {
   padding: 1rem;
   text-align: center;
   font-size: 0.8rem;
-  /* position: absolute; */
-  /* bottom: 0; */
   margin-top: 2rem;
   width: 100%;
 }
@@ -62,7 +60,6 @@ body {
     #02aab0 100%
   );
 
-  /* margin: 10px; */
   padding: 15px 45px;
   text-align: center;
   text-transform: uppercase;
@@ -76,7 +73,7 @@ body {
 }
 
 .btn-read-article:hover {
-  background-position: right center; /* change the direction of the change here */
+  background-position: right center; 
   color: #fff;
   text-decoration: none;
 }
@@ -101,7 +98,13 @@ body {
   }
 }
 
-/* forms */
 .form-floating > textarea.textarea {
   height: 100px;
+} */
+
+.host-picture {
+  width: 100%;
+  height: 100%;
+  max-width: 150px;
+  object-fit: cover;
 }

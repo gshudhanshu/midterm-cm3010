@@ -1,27 +1,78 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Listing Details - <%= listing.name %></title>
+    <%- include('./partials/head', { pageInfo }) %>
   </head>
   <body>
-    <h1><%= listing.name %></h1>
-    <p>Description: <%= listing.description %></p>
-    <p>Neighborhood Overview: <%= listing.neighborhood_overview %></p>
-    <p>Accommodates: <%= listing.accommodates %></p>
-    <p>Bedrooms: <%= listing.bedrooms %></p>
-    <p>Beds: <%= listing.beds %></p>
-    <p>Bathrooms: <%= listing.bathrooms_text %></p>
-    <p>Availability: <%= listing.availability_365 %> days</p>
-    <p>Price: $<%= listing.price %></p>
-    <p>Listing URL ID: <%= listing.listing_url_id %></p>
-    <p>Host ID: <%= listing.host_id %></p>
-    <p>Neighborhood ID: <%= listing.neighborhood_id %></p>
-    <p>Geo Location ID: <%= listing.geo_location_id %></p>
-    <p>Property Type ID: <%= listing.property_type_id %></p>
-    <p>Room Type ID: <%= listing.room_type_id %></p>
-    <!-- Add any other listing details you want to display -->
+    <%- include('./partials/header', { pageInfo }) %>
 
-    <!-- Link to go back to the list of all listings -->
-    <a href="/">Back to All Listings</a>
+    <div class="container mt-5">
+      <div class="row mb-5 gx-5">
+        <div class="col-md-6">
+          <img
+            src="<%= listing.picture_url %>"
+            class="img-fluid"
+            alt="Listing Image"
+          />
+          <div class="my-4">
+            <div class="row g-0">
+              <div class="col-md-4">
+                <img
+                  src="<%= listing.host_picture_url %>"
+                  class="img-fluid rounded-circle"
+                  width="150px"
+                />
+              </div>
+              <div class="col-md-8">
+                <div class="card-body">
+                  <h5 class="card-title"><%= listing.host_name %></h5>
+                  <p class="card-text"><%= listing.host_neighbourhood %></p>
+                  <p class="card-text"><%= listing.host_about %></p>
+                  <a href="<%= listing.host_url %>" class="btn btn-primary my-3"
+                    >More info</a
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <h1 class="mb-3"><%= listing.name %></h1>
+          <p><strong>Neighborhood:</strong><%= listing.neighborhood %></p>
+          <p>
+            <strong>Geo location: </strong>latitude: <%= listing.latitude %>
+            longitude: <%= listing.longitude%>
+          </p>
+          <p>
+            <strong>Neighborhood Overview:</strong>
+          </p>
+          <p><%- listing.neighborhood_overview %></p>
+          <p><strong>Accommodates:</strong> <%= listing.accommodates %></p>
+          <p><strong>Bedrooms:</strong> <%= listing.bedrooms %></p>
+          <p><strong>Beds:</strong> <%= listing.beds %></p>
+          <p><strong>Bathrooms:</strong> <%= listing.bathrooms_text %></p>
+          <p><strong>Property type:</strong> <%= listing.property_type %></p>
+          <p><strong>Room type:</strong> <%= listing.room_type %></p>
+          <p><strong>Amenities:</strong> <%= listing.amenities %></p>
+          <p>
+            <strong>Availability (in days):</strong> <%=
+            listing.availability_365 %>
+          </p>
+          <p><strong>Price:</strong> $<%= listing.price %></p>
+          <p><strong>Description:</strong></p>
+          <p><%- listing.description %></p>
+          <div class="row gx-3">
+            <a class="col btn btn-primary me-3" href="/"
+              >Back to All Listings</a
+            >
+            <a class="col btn btn-primary" href="<%= listing.listing_url %>"
+              >Open on Airbnb</a
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <%- include('./partials/footer') %>
   </body>
 </html>
