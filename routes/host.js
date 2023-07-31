@@ -2,10 +2,10 @@ const express = require('express')
 const router = express.Router()
 
 /**
- * @api {get} / Error 404
+ * @api {get} / Host
  */
-router.get('/*', async (req, res) => {
-  res.status(404).render('404.ejs')
+router.get('/', async (req, res) => {
+  res.render('host')
 })
 
 module.exports = router

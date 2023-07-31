@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>All Listings</title>
+  </head>
+  <body>
+    <h1>All Listings</h1>
+    <% if (listings.length === 0) { %>
+    <p>No listings available.</p>
+    <% } else { %>
+    <ul>
+      <% listings.forEach(listing => { %>
+      <li>
+        <h3><%= listing.name %></h3>
+        <p>Description: <%= listing.description %></p>
+        <p>Neighborhood: <%= listing.neighborhood_overview %></p>
+        <p>Accommodates: <%= listing.accommodates %></p>
+        <p>Bedrooms: <%= listing.bedrooms %></p>
+        <p>Beds: <%= listing.beds %></p>
+        <p>Bathrooms: <%= listing.bathrooms_text %></p>
+        <p>Availability: <%= listing.availability_365 %> days</p>
+        <p>Price: $<%= listing.price %></p>
+        <a href="/listings/<%= listing.listing_id %>">View Details</a>
+      </li>
+      <% }); %>
+    </ul>
+    <% } %>
+  </body>
+</html>

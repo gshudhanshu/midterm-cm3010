@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Host Details</title>
+  </head>
+  <body>
+    <% if (host) { %>
+    <h1><%= host.host_name %></h1>
+    <% if (host.host_picture_url) { %>
+    <img src="<%= host.host_picture_url %>" alt="Host Picture" />
+    <% } %> <% if (host.host_about) { %>
+    <p>About the Host: <%= host.host_about %></p>
+    <% } %> <% if (host.host_neighbourhood) { %>
+    <p>Host's Neighborhood: <%= host.host_neighbourhood %></p>
+    <% } %>
+    <p>Total Listings by Host: <%= host.host_total_listings_count || 0 %></p>
+    <!-- You can display additional information about the host here -->
+    <% } else { %>
+    <p>Host not found.</p>
+    <% } %>
+  </body>
+</html>
