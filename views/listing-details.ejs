@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Listing Details - <%= listing.name %></title>
+  </head>
+  <body>
+    <h1><%= listing.name %></h1>
+    <p>Description: <%= listing.description %></p>
+    <p>Neighborhood Overview: <%= listing.neighborhood_overview %></p>
+    <p>Accommodates: <%= listing.accommodates %></p>
+    <p>Bedrooms: <%= listing.bedrooms %></p>
+    <p>Beds: <%= listing.beds %></p>
+    <p>Bathrooms: <%= listing.bathrooms_text %></p>
+    <p>Availability: <%= listing.availability_365 %> days</p>
+    <p>Price: $<%= listing.price %></p>
+    <p>Listing URL ID: <%= listing.listing_url_id %></p>
+    <p>Host ID: <%= listing.host_id %></p>
+    <p>Neighborhood ID: <%= listing.neighborhood_id %></p>
+    <p>Geo Location ID: <%= listing.geo_location_id %></p>
+    <p>Property Type ID: <%= listing.property_type_id %></p>
+    <p>Room Type ID: <%= listing.room_type_id %></p>
+    <!-- Add any other listing details you want to display -->
+
+    <!-- Link to go back to the list of all listings -->
+    <a href="/">Back to All Listings</a>
+  </body>
+</html>
