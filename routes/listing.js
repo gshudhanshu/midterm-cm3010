@@ -52,7 +52,7 @@ router.get('/', async (req, res) => {
  */
 router.get('/listing/:id', async (req, res) => {
   let query = `SELECT listing.*, listing_url.*, host.*, host_url.*, neighborhood.*, 
-              geo_location.*, property_type.*, room_type.*, 
+              geo_location.*, property_type.*, room_type.*, review.*,
               GROUP_CONCAT(amenity.amenity SEPARATOR ', ') AS amenities
               FROM listing
               INNER JOIN listing_url ON listing.listing_url_id = listing_url.listing_url_id
@@ -62,6 +62,7 @@ router.get('/listing/:id', async (req, res) => {
               INNER JOIN geo_location ON listing.geo_location_id = geo_location.geo_location_id
               INNER JOIN property_type ON listing.property_type_id = property_type.property_type_id
               INNER JOIN room_type ON listing.room_type_id = room_type.room_type_id
+              INNER JOIN review ON listing.review_id = review.review_id
               INNER JOIN listing_amenity_junction ON listing.listing_id = listing_amenity_junction.listing_id
               INNER JOIN amenity ON listing_amenity_junction.amenity_id = amenity.amenity_id
               WHERE listing.listing_id = ?
@@ -69,7 +70,6 @@ router.get('/listing/:id', async (req, res) => {
               LIMIT 1`
   pool.query(query, [req.params.id], (err, result) => {
     if (err) throw err
-    console.log(result[0])
     res.render('listing-details', {
       listing: result[0],
       pageInfo: { title: 'Listing details' },

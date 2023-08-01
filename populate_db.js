@@ -275,6 +275,7 @@ async function bulkInsertData(data) {
       price: parseFloat(row.price.replace(/[$,]/g, '')),
       bedrooms: parseInt(row.bedrooms) || null,
       listing_url_id: listingUrlIds[index],
+      review_id: reviewIds[index],
       host_id: data.host[index].host_id,
       neighborhood_id: neighborhoodIds[index],
       geo_location_id: geoLocationIds[index],

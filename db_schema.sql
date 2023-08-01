@@ -86,8 +86,8 @@ CREATE TABLE amenity (
 -- Create the table review
 CREATE TABLE review (
     review_id int NOT NULL AUTO_INCREMENT,
-    number_of_reviews int NULL,
-    review_scores_rating int NULL,
+    number_of_reviews float NULL,
+    review_scores_rating float NULL,
     PRIMARY KEY (review_id)
 );
 
@@ -109,12 +109,14 @@ CREATE TABLE listing (
   geo_location_id int NOT NULL,
   property_type_id int NOT NULL,
   room_type_id int NOT NULL,
+  review_id int NOT NULL,
   PRIMARY KEY (listing_id),
   FOREIGN KEY (listing_url_id) REFERENCES listing_url(listing_url_id),
   FOREIGN KEY (neighborhood_id) REFERENCES neighborhood(neighborhood_id),
   FOREIGN KEY (geo_location_id) REFERENCES geo_location(geo_location_id),
   FOREIGN KEY (property_type_id) REFERENCES property_type(property_type_id),
   FOREIGN KEY (room_type_id) REFERENCES room_type(room_type_id),
+  FOREIGN KEY (review_id) REFERENCES review(review_id),
   FOREIGN KEY (host_id) REFERENCES host(host_id)
 );
 

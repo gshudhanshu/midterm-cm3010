@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <%- include('./partials/head', { pageInfo }) %>
+  </head>
+  <body>
+    <%- include('./partials/header', { pageInfo }) %>
+    <div class="container my-5">
+      <h1>Create New Host</h1>
+      <form action="/host/add-host" method="post">
+        <div class="mb-3">
+          <label for="host_name" class="form-label">Host Name</label>
+          <input
+            type="text"
+            class="form-control"
+            id="host_name"
+            name="host_name"
+            placeholder="Host Name"
+            required
+          />
+        </div>
+        <div class="mb-3">
+          <label for="host_about" class="form-label">Host About</label>
+          <textarea
+            class="form-control"
+            id="host_about"
+            name="host_about"
+            rows="3"
+            placeholder="About the host"
+            required
+          ></textarea>
+        </div>
+        <div class="mb-3">
+          <label for="host_neighbourhood" class="form-label"
+            >Host Neighbourhood</label
+          >
+          <input
+            type="text"
+            class="form-control"
+            id="host_neighbourhood"
+            name="host_neighbourhood"
+            placeholder="Neightborhood"
+            required
+          />
+        </div>
+        <div class="mb-3">
+          <label for="host_picture_url" class="form-label"
+            >Host Picture URL</label
+          >
+          <input
+            type="url"
+            class="form-control"
+            id="host_picture_url"
+            name="host_picture_url"
+            placeholder="https://example.com/image.jpg"
+            required
+          />
+        </div>
+        <div class="mb-3">
+          <label for="host_location" class="form-label"
+            >Host Location (Origin)
+          </label>
+          <input
+            type="text"
+            class="form-control"
+            id="host_location"
+            name="host_location"
+            placeholder="City, Country"
+            required
+          />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+    </div>
+
+    <%- include('./partials/footer') %>
+  </body>
+</html>

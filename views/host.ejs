@@ -1,22 +1,54 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Host Details</title>
+    <%- include('./partials/head', { pageInfo }) %>
   </head>
   <body>
-    <% if (host) { %>
-    <h1><%= host.host_name %></h1>
-    <% if (host.host_picture_url) { %>
-    <img src="<%= host.host_picture_url %>" alt="Host Picture" />
-    <% } %> <% if (host.host_about) { %>
-    <p>About the Host: <%= host.host_about %></p>
-    <% } %> <% if (host.host_neighbourhood) { %>
-    <p>Host's Neighborhood: <%= host.host_neighbourhood %></p>
-    <% } %>
-    <p>Total Listings by Host: <%= host.host_total_listings_count || 0 %></p>
-    <!-- You can display additional information about the host here -->
-    <% } else { %>
-    <p>Host not found.</p>
-    <% } %>
+    <%- include('./partials/header', { pageInfo }) %> <% if (host) { %>
+
+    <div class="container my-5">
+      <div class="row">
+        <div class="col-md-4">
+          <img
+            src="<%= host.host_picture_url %>"
+            class="img-fluid"
+            alt="Host Image"
+          />
+          <h3 class="mt-3"><%= host.host_name %></h3>
+          <p><%= host.host_about %></p>
+          <div>
+            <p><strong>Location:</strong> <%= host.host_location %></p>
+            <p>
+              <strong>Neighbourhood:</strong> <%= host.host_neighbourhood %>
+            </p>
+            <p>
+              <strong>Total listings (lifetime):</strong> <%=
+              host.host_total_listings_count %>
+            </p>
+          </div>
+        </div>
+        <div class="col-md-8">
+          <h3 class="mt-3">Summary</h3>
+          <p><%= host.host_about %></p>
+
+          <h3 class="my-3">Listings by <%= host.host_name %></h3>
+          <% if (listings.length === 0) { %>
+          <p>No listings available for this host.</p>
+          <% } else { %>
+          <ul class="list-group">
+            <% listings.forEach(listing => { %>
+            <li class="list-group-item">
+              <a href="/listing/<%= listing.listing_id %>"
+                ><%= listing.name %></a
+              >
+            </li>
+            <% }); %>
+          </ul>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <% } %> <%- include('./partials/footer') %>
   </body>
 </html>

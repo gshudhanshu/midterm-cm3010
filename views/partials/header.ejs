@@ -10,39 +10,58 @@
         <span
           class="bs-icon-sm bs-icon-circle bs-icon-primary d-flex justify-content-center align-items-center me-2 bs-icon"
         >
-          <i class="bi bi-code-slash fs-2"></i>
+          <i class="fa-brands fa-airbnb main-logo">Airbnb</i>
         </span>
       </a>
 
       <ul
         class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0"
       >
-        <li><a href="#" class="nav-link px-2 text-secondary">Home</a></li>
-        <li><a href="#" class="nav-link px-2 text-white">Features</a></li>
-        <li><a href="#" class="nav-link px-2 text-white">Pricing</a></li>
-        <li><a href="#" class="nav-link px-2 text-white">FAQs</a></li>
-        <li><a href="#" class="nav-link px-2 text-white">About</a></li>
+        <li>
+          <a
+            href="/"
+            class="nav-link px-3 text-white <%= pageInfo.title === 'All listings' ? 'active' : '' %>"
+            >All listings</a
+          >
+        </li>
+        <li>
+          <a
+            href="/listing/add-listing"
+            class="nav-link px-3 text-white <%= pageInfo.title === 'Add listing' ? 'active' : '' %>"
+            >Add listing</a
+          >
+        </li>
+        <li>
+          <a
+            href="/host/add-host"
+            class="nav-link px-3 text-white <%= pageInfo.title === 'Add host' ? 'active' : '' %>"
+            >Add host</a
+          >
+        </li>
       </ul>
 
       <form
-        class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3"
+        class="row row-cols-lg-auto g-3 align-items-center"
         role="search"
         action="/"
       >
-        <input
-          type="text"
-          name="search"
-          id="search"
-          class="form-control form-control-dark text-bg-dark"
-          placeholder="Search..."
-          aria-label="Search"
-        />
+        <div class="col-12">
+          <label class="visually-hidden" for="inlineFormInputGroupUsername"
+            >Username</label
+          >
+          <input
+            type="text"
+            name="search"
+            id="search"
+            class="form-control form-control-dark"
+            placeholder="Search..."
+            aria-label="Search"
+          />
+        </div>
+        <div class="col-12">
+          <button type="submit" class="btn btn-warning">Submit</button>
+        </div>
       </form>
-
-      <div class="text-end">
-        <button type="button" class="btn btn-outline-light me-2">Login</button>
-        <button type="button" class="btn btn-warning">Sign-up</button>
-      </div>
     </div>
   </div>
 </header>

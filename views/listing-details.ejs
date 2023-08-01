@@ -15,7 +15,7 @@
             alt="Listing Image"
           />
           <div class="my-4">
-            <div class="row g-0">
+            <div class="row g-3">
               <div class="col-md-4">
                 <img
                   src="<%= listing.host_picture_url %>"
@@ -28,7 +28,9 @@
                   <h5 class="card-title"><%= listing.host_name %></h5>
                   <p class="card-text"><%= listing.host_neighbourhood %></p>
                   <p class="card-text"><%= listing.host_about %></p>
-                  <a href="<%= listing.host_url %>" class="btn btn-primary my-3"
+                  <a
+                    href="/host/<%= listing.host_id %>"
+                    class="btn btn-primary my-3"
                     >More info</a
                   >
                 </div>
@@ -57,6 +59,10 @@
           <p>
             <strong>Availability (in days):</strong> <%=
             listing.availability_365 %>
+          </p>
+          <p>
+            <strong>Review:</strong> ★ <%= listing.review_scores_rating %>(<%=
+            listing.number_of_reviews %>)
           </p>
           <p><strong>Price:</strong> $<%= listing.price %></p>
           <p><strong>Description:</strong></p>
