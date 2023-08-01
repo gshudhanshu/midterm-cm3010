@@ -8,14 +8,14 @@
     <div class="container my-5">
       <h1>Create New Listing</h1>
       <form action="/listing/add-listing" method="post">
-        <div class="mb-3">
+        <div class="mb-3 form-group required">
           <label for="name" class="form-label">Name</label>
           <input
             type="text"
             class="form-control"
             id="name"
             name="name"
-            placeholder="Name"
+            placeholder="John Doe"
             required
           />
         </div>
@@ -44,119 +44,68 @@
           ></textarea>
         </div>
         <div class="mb-3">
-          <label for="neighborhood_overview" class="form-label"
-            >Amenities</label
-          >
+          <label for="amenities" class="form-label">Amenities</label>
           <textarea
             class="form-control"
             id="amenities"
             name="amenities"
             rows="3"
-            placeholder="Amenities"
+            placeholder="Fridge, AC, TV, ..."
             required
           ></textarea>
         </div>
         <div class="mb-3">
-          <label for="accommodates" class="form-label">Neighborhood</label>
+          <label for="accommodates" class="form-label">Accommodates</label>
           <input
-            type="text"
+            type="number"
             class="form-control"
             id="accommodates"
             name="accommodates"
-            placeholder="Accommodates"
+            placeholder="00"
             required
           />
         </div>
         <div class="mb-3">
-          <label for="bedrooms" class="form-label">Neighborhood</label>
+          <label for="bedrooms" class="form-label">Bedrooms</label>
           <input
             type="text"
             class="form-control"
             id="bedrooms"
             name="bedrooms"
-            placeholder="Bedrooms"
+            placeholder="00"
             required
           />
         </div>
         <div class="mb-3">
-          <label for="beds" class="form-label">Neighborhood</label>
+          <label for="beds" class="form-label">Beds</label>
           <input
             type="text"
             class="form-control"
             id="beds"
             name="beds"
-            placeholder="Beds"
+            placeholder="00"
             required
           />
         </div>
         <div class="mb-3">
-          <label for="beds" class="form-label">Geography Coordinates</label>
+          <label for="latitude" class="form-label">Latitude</label>
           <input
             type="text"
             class="form-control"
             id="latitude"
             name="latitude"
-            placeholder="Latitude"
+            placeholder="51.509865"
             required
           />
+        </div>
+        <div class="mb-3">
+          <label for="longitude" class="form-label">Longitude</label>
           <input
             type="text"
             class="form-control"
             id="longitude"
             name="longitude"
-            placeholder="Longitude"
-            required
-          />
-        </div>
-        <div class="mb-3">
-          <label for="bathrooms" class="form-label">Property type </label>
-          <input
-            type="text"
-            class="form-control"
-            id="bathrooms"
-            name="bathrooms"
-            placeholder="Bathrooms"
-            required
-          />
-        </div>
-        <div class="mb-3">
-          <label for="bathrooms" class="form-label">Room type </label>
-          <input
-            type="text"
-            class="form-control"
-            id="room_type"
-            name="room_type"
-            placeholder="Room type"
-            required
-          />
-        </div>
-        <div class="mb-3">
-          <label for="bathrooms" class="form-label">Review</label>
-          <input
-            type="text"
-            class="form-control"
-            id="room_type"
-            name="room_type"
-            placeholder="Room type"
-            required
-          />
-          <input
-            type="text"
-            class="form-control"
-            id="room_type"
-            name="room_type"
-            placeholder="Room type"
-            required
-          />
-        </div>
-        <div class="mb-3">
-          <label for="bathrooms" class="form-label">Room type </label>
-          <input
-            type="text"
-            class="form-control"
-            id="room_type"
-            name="room_type"
-            placeholder="Room type"
+            placeholder="-0.118092"
             required
           />
         </div>
@@ -165,31 +114,62 @@
           <input
             type="text"
             class="form-control"
-            id="property_type"
-            name="property_type"
-            placeholder="Property type"
+            id="bathrooms"
+            name="bathrooms"
+            placeholder="2 baths"
             required
           />
         </div>
-        <div class="mb-3">
-          <label for="availability_365" class="form-label">Neighborhood</label>
+        <div class="mb-3 form-group required">
+          <label for="room_type" class="form-label">Room Type</label>
           <input
             type="text"
+            class="form-control"
+            id="room_type"
+            name="room_type"
+            placeholder="Type to Search Room Type or Create New Property Type"
+            list="room_types"
+            required
+          />
+          <datalist id="room_types">
+            <% for (let room_type of room_types) { %>
+            <option value="<%= room_type.room_type_id %>">
+              <%= room_type.room_type %> (Room type ID: <%=
+              room_type.room_type_id %>)
+            </option>
+            <% } %>
+          </datalist>
+        </div>
+        <div class="mb-3 form-group required">
+          <label for="property_type" class="form-label">Property Type</label>
+          <input
+            type="text"
+            class="form-control"
+            id="property_type"
+            name="property_type"
+            placeholder="Type to Search Property Type or Create New Property Type"
+            list="property_types"
+            required
+          />
+          <datalist id="property_types">
+            <% for (let property_type of property_types) { %>
+            <option value="<%= property_type.property_type_id %>">
+              <%= property_type.property_type %> (Property type ID: <%=
+              property_type.property_type_id %>)
+            </option>
+            <% } %>
+          </datalist>
+        </div>
+        <div class="mb-3">
+          <label for="availability_365" class="form-label"
+            >Availability in 365 days
+          </label>
+          <input
+            type="int"
             class="form-control"
             id="availability_365"
             name="availability_365"
-            placeholder="Availability 365"
-            required
-          />
-        </div>
-        <div class="mb-3">
-          <label for="neighborhood" class="form-label">Neighborhood</label>
-          <input
-            type="text"
-            class="form-control"
-            id="neighborhood"
-            name="neighborhood"
-            placeholder="Neighborhood"
+            placeholder="000"
             required
           />
         </div>
@@ -204,8 +184,8 @@
             required
           />
         </div>
-        <div class="mb-3">
-          <label for="price" class="form-label">Price</label>
+        <div class="mb-3 form-group required">
+          <label for="price" class="form-label">Price ($)</label>
           <input
             type="number"
             class="form-control"
@@ -215,7 +195,7 @@
             required
           />
         </div>
-        <div class="mb-3">
+        <div class="mb-3 form-group required">
           <label for="host_id" class="form-label">Select Host</label>
           <input
             type="text"
