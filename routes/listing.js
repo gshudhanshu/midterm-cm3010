@@ -7,7 +7,6 @@ const pool = require('../dbconnection')
  * Add new listing
  */
 router.get('/listing/add-listing', async (req, res) => {
-  console.log('test')
   try {
     const hosts = await pool.query('SELECT host_id, host_name FROM host')
     const roomTypes = await pool.query(
@@ -444,7 +443,6 @@ router.get('/', async (req, res) => {
 
     const [countResult] = await pool.query(countQuery)
     const totalPages = Math.ceil(countResult[0].total / offset)
-    console.log(totalPages)
 
     const [result] = await pool.query(query)
     res.render('listings', {

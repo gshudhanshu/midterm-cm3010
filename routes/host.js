@@ -174,13 +174,11 @@ router.post('/delete/:id', async (req, res) => {
     const deleteReviewQuery = `DELETE FROM review WHERE review_id = ?`
     const deleteListingUrlQuery = `DELETE FROM listing_url WHERE listing_url_id = ?`
 
-    console.log('Listings:', listings)
     // Delete the listings
     listings.forEach(async (listing) => {
       const [currListing] = await pool.query(getListingQuery, [
         listing.listing_id,
       ])
-      console.log('Current listing:', currListing)
       await pool.query(deleteListingAmenityJunctionQuery, [
         currListing[0].listing_id,
       ])
