@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "create_db": "node create_db.js",
+    "populate_db": "node populate_db.js",
     "start": "node index.js",
     "dev": "nodemon index.js"
   },
