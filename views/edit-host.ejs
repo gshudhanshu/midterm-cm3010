@@ -28,7 +28,6 @@
             name="host_about"
             rows="3"
             placeholder="About the host"
-            required
           >
  <%= host.host_about %>
          </textarea
@@ -46,7 +45,6 @@
             placeholder="Type to Select Neighbourhood Or Create New Neighbourhood"
             list="host_neighbourhoods"
             value="<%= host.host_neighbourhood %>"
-            required
           />
           <datalist id="host_neighbourhoods">
             <% for (let host_neighbourhood of host_neighbourhoods) { %>
@@ -68,7 +66,6 @@
             name="host_picture_url"
             placeholder="https://example.com/image.jpg"
             value="<%= host.host_picture_url %>"
-            required
           />
         </div>
         <div class="mb-3">
@@ -83,7 +80,6 @@
             list="host_locations"
             placeholder="Type to Select Location Or Create New Location"
             value="<%= host.host_location %>"
-            required
           />
           <datalist id="host_locations">
             <% for (let host_location of host_locations) { %>
