@@ -347,7 +347,7 @@ router.get('/:id', async (req, res) => {
     delete hostData.listing_names
     delete hostData.listing_urls
 
-    if (hostData.host_id) {
+    if (!hostData.host_id) {
       res.status(404).render('404.ejs', { pageInfo: { title: '404' } })
       return
     }
