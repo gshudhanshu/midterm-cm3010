@@ -14,7 +14,9 @@ const pool = mysql.createPool({
   multipleStatements: true,
 })
 
+// Function to filter and restructuring CSV data
 const filterData = (arrayOfObj) => {
+  // Obect to store data
   objArr = {
     listing_url: [],
     host_url: [],
@@ -29,6 +31,8 @@ const filterData = (arrayOfObj) => {
     host: [],
     listing: [],
   }
+
+  // Loop through the array of objects
   arrayOfObj.reduce((acc, curr) => {
     objArr.listing_url.push({
       listing_url: curr.listing_url,
@@ -99,6 +103,7 @@ const filterData = (arrayOfObj) => {
   return objArr
 }
 
+// Function to find or create amenity IDs
 async function findOrCreateAmenities(amenityValues) {
   const amenityIds = []
 
@@ -130,6 +135,7 @@ async function findOrCreateAmenities(amenityValues) {
   return amenityIds
 }
 
+// Function to find or create rows in a table and return their IDs
 async function findOrCreate(tableName, columnName, data, idColumn = false) {
   const keys = Object.keys(data[0])
   const values = data.map((row) =>
@@ -157,6 +163,7 @@ async function findOrCreate(tableName, columnName, data, idColumn = false) {
   return insertedIds
 }
 
+// Function to find or create a row in a table and return its ID
 async function findOrCreateEntityId(tableName, columnName, value) {
   const [rows] = await pool.query(
     `SELECT ${columnName}_id FROM ${tableName} WHERE ${columnName} = ?`,
@@ -173,6 +180,7 @@ async function findOrCreateEntityId(tableName, columnName, value) {
   }
 }
 
+// Function to insert data into a table and return the generated IDs
 async function insertData(tableName, data, idColumn = false) {
   const keys = Object.keys(data[0])
   const values = data.map((row) =>
@@ -197,6 +205,7 @@ async function insertData(tableName, data, idColumn = false) {
   return insertedIds
 }
 
+// Function to insert the listing_amenity_junction table
 async function insertListingAmenityJunction(listingIds, amenityIds) {
   const values = []
   for (let i = 0; i < listingIds.length; i++) {
@@ -204,13 +213,13 @@ async function insertListingAmenityJunction(listingIds, amenityIds) {
       values.push([listingIds[i], amenityId])
     }
   }
+
   const query =
     'INSERT INTO listing_amenity_junction (listing_id, amenity_id) VALUES ?'
   await pool.query(query, [values])
 }
 
 async function bulkInsertData(data) {
-  // Find or create amenity IDs for each listing
   let idsArr = {
     amenityIds: [],
     hostLocationIds: [],
@@ -219,6 +228,8 @@ async function bulkInsertData(data) {
     propertyTypeIds: [],
     roomTypeIds: [],
   }
+
+  // Find or create IDs for amenities
   for (const row of data.amenity) {
     const amenityIds = await findOrCreateAmenities(row.amenities)
     idsArr.amenityIds.push(amenityIds)
@@ -285,6 +296,8 @@ async function bulkInsertData(data) {
     })),
     'host_id'
   )
+
+  // Insert listing table and store generated listing_id
   const listingIds = await findOrCreate(
     'listing',
     'listing',
@@ -303,15 +316,20 @@ async function bulkInsertData(data) {
     'listing_id'
   )
 
-  // // Insert the listing_amenity_junction table
+  // Insert the listing_amenity_junction table
   await insertListingAmenityJunction(listingIds, idsArr.amenityIds)
 }
 
+// Function to read the CSV file and insert data in chunks
 async function readCSVFile(filePath, chunkSize) {
+  // Array to store rows from CSV file
   let rows = []
+  // Variable to count the number of chunks
   let chunkCount = 0
+  // Array to store promises of all chunks
   const allChunks = []
 
+  // Create a promise for each chunk
   return new Promise((resolve, reject) => {
     const parser = fs.createReadStream(filePath).pipe(
       csvParser({
@@ -323,10 +341,11 @@ async function readCSVFile(filePath, chunkSize) {
         },
       })
     )
+
+    // Function to process each chunk
     const processChunk = async (chunk) => {
       try {
         const splitedChunk = filterData(chunk)
-        // console.log(splitedChunk.listing_url)
         await bulkInsertData(splitedChunk)
         console.log(`Processed ${chunk.length} rows.`)
         chunkCount++
@@ -335,6 +354,7 @@ async function readCSVFile(filePath, chunkSize) {
       }
     }
 
+    // Process each row from the CSV file
     parser.on('data', async (row) => {
       // row.amenities = row.amenities.replace(/'/g, '"').split(',')
       // row.amenities = row.amenities.replace(/\[|\]/g, '').split(',')
@@ -342,6 +362,7 @@ async function readCSVFile(filePath, chunkSize) {
       // console.log(row.amenities)
       rows.push(row)
 
+      // If the number of rows equals the chunk size, process the chunk
       if (rows.length === chunkSize) {
         const chunk = rows.splice(0, chunkSize)
         try {
@@ -354,6 +375,7 @@ async function readCSVFile(filePath, chunkSize) {
       }
     })
 
+    // Process the remaining rows
     parser.on('end', async () => {
       if (rows.length > 0) {
         try {
@@ -363,6 +385,7 @@ async function readCSVFile(filePath, chunkSize) {
         }
       }
 
+      // Wait for all chunks to be processed
       try {
         await Promise.all(allChunks)
         resolve()
@@ -377,10 +400,11 @@ async function readCSVFile(filePath, chunkSize) {
   })
 }
 
-// Assuming you have the CSV file path and chunk size defined
+// CSV file path and chunk size
 const filePath = './csv/listings.csv'
 const chunkSize = 500
 
+// Call the function to read the CSV file and insert data in chunks
 readCSVFile(filePath, chunkSize)
   .then(() => {
     console.log('Bulk insertion completed successfully.')

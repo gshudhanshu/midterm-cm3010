@@ -3,7 +3,8 @@ const router = express.Router()
 const pool = require('../dbconnection')
 
 /**
- * @api {get} / Add new host
+ * @api {get} /host/add-host
+ * Add new host page
  */
 router.get('/add-host', async (req, res) => {
   res.render('add-host', {
@@ -12,10 +13,12 @@ router.get('/add-host', async (req, res) => {
 })
 
 /**
- * @api {post} / Add new host
+ * @api {post} /host/add-host
+ * Add new host form submission
  */
 router.post('/add-host', async (req, res) => {
   try {
+    // Get the form data
     const {
       host_name,
       host_about,
@@ -24,10 +27,10 @@ router.post('/add-host', async (req, res) => {
       host_location,
     } = req.body
 
-    // As we don't have a form field for host_url which is a link to the host's profile on Airbnb,
-    // we'll hardcode it to a default value
+    // We'll hardcode host_url which is a link to the host's profile on Airbnb
     const host_url = 'https://www.airbnb.co.in'
 
+    // SQL queries to add host related data
     const addHostUrlQuery = `INSERT INTO host_url (host_url, host_picture_url) VALUES (?, ?)`
     const addHostNeighbourhoodQuery = `INSERT INTO host_neighbourhood (host_neighbourhood)
                                        VALUES (?)
@@ -39,26 +42,26 @@ router.post('/add-host', async (req, res) => {
       ON DUPLICATE KEY UPDATE host_location = VALUES(host_location),
       host_location_id = LAST_INSERT_ID(host_location_id)`
 
-    // Execute the host_url query using async/await
+    // Execute the host_url query
     const urlResult = await pool.query(addHostUrlQuery, [
       host_url,
       host_picture_url,
     ])
     const host_url_id = urlResult[0].insertId
 
-    // Execute the host_neighbourhood query using async/await
+    // Execute the host_neighbourhood query
     const neighbourhoodResult = await pool.query(addHostNeighbourhoodQuery, [
       host_neighbourhood,
     ])
     const host_neighbourhood_id = neighbourhoodResult[0].insertId
 
-    // Execute the host_location query using async/await
+    // Execute the host_location query
     const locationResult = await pool.query(addHostLocationQuery, [
       host_location,
     ])
     const host_location_id = locationResult[0].insertId
 
-    // Insert the new host into the host table using async/await
+    // Insert the new host into the host table
     const insertHostQuery = `INSERT INTO host (host_name, host_about, host_total_listings_count,
     host_url_id,host_neighbourhood_id, host_location_id) VALUES (?, ?, ?, ?, ?, ?)`
     const result = await pool.query(insertHostQuery, [
@@ -71,7 +74,7 @@ router.post('/add-host', async (req, res) => {
     ])
 
     const newHostId = result[0].insertId
-    console.log('New host ID:', newHostId)
+
     res.redirect('/host/' + newHostId)
   } catch (err) {
     console.error('Error adding host:', err)
@@ -86,6 +89,7 @@ router.post('/add-host', async (req, res) => {
 
 router.post('/edit/:id', async (req, res) => {
   try {
+    // Get the form data
     const {
       host_name,
       host_about,
@@ -94,10 +98,10 @@ router.post('/edit/:id', async (req, res) => {
       host_location,
     } = req.body
 
-    // As we don't have a form field for host_url which is a link to the host's profile on Airbnb,
-    // we'll hardcode it to a default value
+    // We'll hardcode host_url which is a link to the host's profile on Airbnb
     const host_url = 'https://www.airbnb.co.in'
 
+    // SQL queries to add host related data
     const updateHostUrlQuery = `UPDATE host_url SET host_url = ?, host_picture_url = ? WHERE host_url_id = ?`
     const addHostNeighbourhoodQuery = `INSERT INTO host_neighbourhood (host_neighbourhood)
                                        VALUES (?)
@@ -109,12 +113,13 @@ router.post('/edit/:id', async (req, res) => {
       ON DUPLICATE KEY UPDATE host_location = VALUES(host_location),
       host_location_id = LAST_INSERT_ID(host_location_id)`
 
+    // Get the host data from the database
     const host_id = req.params.id
     const [host] = await pool.query('SELECT * FROM host WHERE host_id = ?', [
       host_id,
     ])
 
-    // Execute the host_url query using async/await
+    // Execute the host_url query
     const urlResult = await pool.query(updateHostUrlQuery, [
       host_url,
       host_picture_url,
@@ -123,19 +128,19 @@ router.post('/edit/:id', async (req, res) => {
 
     const host_url_id = urlResult[0].insertId
 
-    // Execute the host_neighbourhood query using async/await
+    // Execute the host_neighbourhood query
     const neighbourhoodResult = await pool.query(addHostNeighbourhoodQuery, [
       host_neighbourhood,
     ])
     const host_neighbourhood_id = neighbourhoodResult[0].insertId
 
-    // Execute the host_location query using async/await
+    // Execute the host_location query
     const locationResult = await pool.query(addHostLocationQuery, [
       host_location,
     ])
     const host_location_id = locationResult[0].insertId
 
-    // Update the new host into the host table using async/await
+    // Update the new host into the host table
     const updateHostQuery = `UPDATE host SET host_name = ?, host_about = ?,
     host_url_id = ?, host_neighbourhood_id = ?, host_location_id = ? WHERE host_id = ?`
     const result = await pool.query(insertHostQuery, [
@@ -148,7 +153,7 @@ router.post('/edit/:id', async (req, res) => {
     ])
 
     const newHostId = result[0].insertId
-    console.log('New host ID:', newHostId)
+
     res.redirect('/host/' + newHostId)
   } catch (err) {
     console.error('Error editing host:', err)
@@ -162,11 +167,11 @@ router.post('/edit/:id', async (req, res) => {
  */
 router.post('/delete/:id', async (req, res) => {
   try {
+    // Get the id of the host to be deleted
     const host_id = req.params.id
 
+    // SQL queries to delete listing related data
     const getListingsQuery = `SELECT listing_id FROM listing WHERE host_id = ?`
-    const [listings] = await pool.query(getListingsQuery, [host_id])
-
     const getListingQuery = `SELECT * FROM listing WHERE listing_id = ? LIMIT 1`
     const deleteListingAmenityJunctionQuery = `DELETE FROM listing_amenity_junction WHERE listing_id = ?`
     const deleteListingQuery = `DELETE FROM listing WHERE listing_id = ?`
@@ -174,11 +179,16 @@ router.post('/delete/:id', async (req, res) => {
     const deleteReviewQuery = `DELETE FROM review WHERE review_id = ?`
     const deleteListingUrlQuery = `DELETE FROM listing_url WHERE listing_url_id = ?`
 
+    // Get all the listings of the host
+    const [listings] = await pool.query(getListingsQuery, [host_id])
+
     // Delete the listings
     listings.forEach(async (listing) => {
+      // Get listing data
       const [currListing] = await pool.query(getListingQuery, [
         listing.listing_id,
       ])
+      // Delete listing related data
       await pool.query(deleteListingAmenityJunctionQuery, [
         currListing[0].listing_id,
       ])
@@ -188,14 +198,18 @@ router.post('/delete/:id', async (req, res) => {
       await pool.query(deleteListingUrlQuery, [currListing[0].listing_url_id])
     })
 
+    // SQL queries to delete host related data
     const deleteHostUrlQuery = `DELETE FROM host_url WHERE host_url_id = ?`
     const deleteHostNeighbourhoodQuery = `DELETE FROM host_neighbourhood WHERE host_neighbourhood_id = ?`
     const deleteHostLocationQuery = `DELETE FROM host_location WHERE host_location_id = ?`
     const deleteHostQuery = `DELETE FROM host WHERE host_id = ?`
+
+    // Delete host related data
     await pool.query(deleteHostUrlQuery, [host_id])
     await pool.query(deleteHostNeighbourhoodQuery, [host_id])
     await pool.query(deleteHostLocationQuery, [host_id])
     await pool.query(deleteHostQuery, [host_id])
+
     res.redirect('/')
   } catch (err) {
     console.error('Error deleting host:', err)
@@ -209,7 +223,9 @@ router.post('/delete/:id', async (req, res) => {
  */
 router.get('/edit/:id', async (req, res) => {
   try {
+    // Get ID of the host to be edited
     const host_id = req.params.id
+    // SQL query to get host details
     const query = `SELECT host.*, host_url.*, host_location.*, host_neighbourhood.*,
                    GROUP_CONCAT(DISTINCT listing.listing_id SEPARATOR ', ') AS listings,
                    GROUP_CONCAT(DISTINCT listing.name SEPARATOR ', ') AS listing_names,
@@ -224,6 +240,7 @@ router.get('/edit/:id', async (req, res) => {
                    GROUP BY host.host_id
                    LIMIT 1`
 
+    // Execute the query
     const [result] = await pool.query(query, [host_id])
     const hostData = result[0]
 
@@ -246,6 +263,7 @@ router.get('/edit/:id', async (req, res) => {
       }
     }
 
+    // Get host locations and host neighbourhoods
     const [host_locations] = await pool.query('SELECT * FROM host_location')
     const [host_neighbourhoods] = await pool.query(
       'SELECT * FROM host_neighbourhood'
@@ -268,7 +286,9 @@ router.get('/edit/:id', async (req, res) => {
  */
 router.get('/:id', async (req, res) => {
   try {
+    // Get ID of the host to be fetched
     const host_id = req.params.id
+    // SQL query to get host details
     const query = `SELECT host.*, host_url.*, host_location.*, host_neighbourhood.*,
                    GROUP_CONCAT(DISTINCT listing.listing_id SEPARATOR ', ') AS listings,
                    GROUP_CONCAT(DISTINCT listing.name SEPARATOR ', ') AS listing_names,
@@ -283,6 +303,7 @@ router.get('/:id', async (req, res) => {
                    GROUP BY host.host_id
                    LIMIT 1`
 
+    // Execute the query
     const [result] = await pool.query(query, [host_id])
     const hostData = result[0]
 
@@ -305,9 +326,11 @@ router.get('/:id', async (req, res) => {
       }
     }
 
+    // Delete the unnecessary properties from the hostData object
     delete hostData.listings
     delete hostData.listing_names
     delete hostData.listing_urls
+
     res.render('host', {
       host: hostData,
       listings: hostListings,

@@ -8,6 +8,7 @@ const pool = require('../dbconnection')
  */
 router.get('/listing/add-listing', async (req, res) => {
   try {
+    // Fetch data from foreign tables
     const hosts = await pool.query('SELECT host_id, host_name FROM host')
     const roomTypes = await pool.query(
       'SELECT room_type_id, room_type FROM room_type'
@@ -32,6 +33,7 @@ router.get('/listing/add-listing', async (req, res) => {
  * @api {post} /listing/add-listing Add new listing
  */
 router.post('/listing/add-listing', async (req, res) => {
+  // Destructure the request body
   let {
     name,
     description,
@@ -52,22 +54,26 @@ router.post('/listing/add-listing', async (req, res) => {
     host_id,
   } = req.body
 
+  // Set default values for optional fields
   accommodates = accommodates !== '' ? accommodates : null
   bedrooms = bedrooms !== '' ? bedrooms : null
   beds = beds !== '' ? beds : null
   availability_365 = availability_365 !== '' ? availability_365 : null
   latitude = latitude !== '' ? latitude : null
   longitude = longitude !== '' ? longitude : null
+
+  // If picture_url is empty, set it to a default value
+  // This image is taken from Wikimedia Commons
   // https://commons.wikimedia.org/wiki/File:No_Image_Available.jpg
   picture_url =
     picture_url !== ''
       ? picture_url
       : 'https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg'
 
-  // As we don't have listing_url as it is a link to the listing on Airbnb,
-  // we'll hardcode it to a default value
+  // We'll hardcode listing_url which is a link to the listing on Airbnb
   const listing_url = 'https://www.airbnb.co.in'
 
+  // SQL queries to insert into foreign tables
   const addListingUrlQuery = `INSERT INTO listing_url (listing_url, picture_url
     ) VALUES (?, ?)`
   const addNeighbourhoodQuery = `INSERT INTO neighbourhood (neighbourhood)
@@ -91,6 +97,7 @@ router.post('/listing/add-listing', async (req, res) => {
                           (number_of_reviews, review_scores_rating)
                           VALUES (?, ?)`
 
+  // Inserting into foreign tables
   const listingUrlResult = await pool.query(addListingUrlQuery, [
     listing_url,
     picture_url,
@@ -107,6 +114,7 @@ router.post('/listing/add-listing', async (req, res) => {
   ])
   const roomTypeResult = await pool.query(addRoomTypeQuery, [room_type])
 
+  // Inserting into amenities table
   const amenityIds = []
   if (amenities && amenities.length > 0) {
     amenities.split(',').forEach(async (amenity) => {
@@ -118,6 +126,7 @@ router.post('/listing/add-listing', async (req, res) => {
   // Inserting 0 number_of_reviews and 0 review_scores_rating as it is new listing
   const reviewResult = await pool.query(addReviewQuery, [0, 0])
 
+  // Getting the IDs of the inserted records
   const listing_url_id = listingUrlResult[0].insertId
   const neighbourhood_id = neighbourhoodResult[0].insertId
   const geo_location_id = geoLocationResult[0].insertId
@@ -161,12 +170,12 @@ router.post('/listing/add-listing', async (req, res) => {
     })
   }
 
+  // Increment number_of_listings for the host
   await pool.query(
     `UPDATE host SET number_of_listings = number_of_listings + 1 WHERE host_id = ?`,
     [host_id]
   )
 
-  // Assuming you have a success page, you can redirect to it
   res.redirect('/listing/' + listingResult[0].insertId)
 })
 
@@ -176,8 +185,10 @@ router.post('/listing/add-listing', async (req, res) => {
  */
 
 router.get('/listing/edit/:id', async (req, res) => {
+  // Get listing ID from the params
   let listing_id = req.params.id
   try {
+    // SQL query to fetch listing details
     let query = `SELECT listing.*, listing_url.*, host.*, host_url.*, neighbourhood.*, 
                 geo_location.*, property_type.*, room_type.*, review.*,
                 GROUP_CONCAT(amenity.amenity SEPARATOR ', ') AS amenities
@@ -196,6 +207,7 @@ router.get('/listing/edit/:id', async (req, res) => {
                 GROUP BY listing.listing_id
                 LIMIT 1`
 
+    // Fetch data from foreign tables
     const hosts = await pool.query('SELECT host_id, host_name FROM host')
     const roomTypes = await pool.query(
       'SELECT room_type_id, room_type FROM room_type'
@@ -203,7 +215,9 @@ router.get('/listing/edit/:id', async (req, res) => {
     const propertyTypes = await pool.query(
       'SELECT property_type_id, property_type FROM property_type'
     )
+    // Fetch listing details
     const [result] = await pool.query(query, [listing_id])
+
     res.render('edit-listing', {
       listing: result[0],
       pageInfo: { title: 'Edit Listing' },
@@ -223,6 +237,7 @@ router.get('/listing/edit/:id', async (req, res) => {
  */
 router.post('/listing/edit/:id', async (req, res) => {
   try {
+    // Destructure the request body
     let {
       name,
       description,
@@ -243,24 +258,29 @@ router.post('/listing/edit/:id', async (req, res) => {
       host_id,
     } = req.body
 
+    // Get listing ID from the params
     let listing_id = req.params.id
 
+    // Set default values for optional fields
     accommodates = accommodates !== '' ? accommodates : null
     bedrooms = bedrooms !== '' ? bedrooms : null
     beds = beds !== '' ? beds : null
     availability_365 = availability_365 !== '' ? availability_365 : null
     latitude = latitude !== '' ? latitude : null
     longitude = longitude !== '' ? longitude : null
+
+    // If picture_url is empty, set it to a default value
+    // This image is taken from Wikimedia Commons
     // https://commons.wikimedia.org/wiki/File:No_Image_Available.jpg
     picture_url =
       picture_url !== ''
         ? picture_url
         : 'https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg'
 
-    // As we don't have listing_url as it is a link to the listing on Airbnb,
-    // we'll hardcode it to a default value
+    // We'll hardcode host_url which is a link to the host's profile on Airbnb
     const listing_url = 'https://www.airbnb.co.in'
 
+    // SQL queries to update foreign tables
     const updateListingUrlQuery = `UPDATE listing_url
                                  SET listing_url = ?, picture_url = ?
                                  WHERE listing_url_id = ?`
@@ -284,6 +304,7 @@ router.post('/listing/edit/:id', async (req, res) => {
 
     const getListingQuery = `SELECT * FROM listing WHERE listing_id = ? LIMIT 1`
 
+    // Fetch listing details
     const [listing] = await pool.query(getListingQuery, [listing_id])
 
     // Update listing_url record
@@ -293,6 +314,7 @@ router.post('/listing/edit/:id', async (req, res) => {
       listing[0].listing_url_id,
     ])
 
+    // SQL query to update neighbourhood record
     const updateNeighbourhoodQuery = `INSERT INTO neighbourhood (neighbourhood)
     VALUES (?) AS NEW
     ON DUPLICATE KEY UPDATE neighbourhood = VALUES(neighbourhood),
@@ -304,19 +326,17 @@ router.post('/listing/edit/:id', async (req, res) => {
       neighbourhood,
     ])
 
-    // Update or insert geo_location record
+    // Update listing releated records
     await pool.query(updateGeoLocationQuery, [
       latitude,
       longitude,
       listing[0].geo_location_id,
     ])
 
-    // Update or insert property_type record
     const propertyTypeResult = await pool.query(addPropertyTypeQuery, [
       property_type,
     ])
 
-    // Update or insert room_type record
     const roomTypeResult = await pool.query(addRoomTypeQuery, [room_type])
 
     // Update or insert amenities and get their IDs
@@ -328,6 +348,7 @@ router.post('/listing/edit/:id', async (req, res) => {
       })
     }
 
+    // SQL query to update listing record
     const updateListingQuery = `UPDATE listing
       SET name = ?, description = ?, neighbourhood_overview = ?, accommodates = ?,
       bedrooms = ?, beds = ?, bathrooms_text = ?, availability_365 = ?, price = ?,
@@ -335,9 +356,9 @@ router.post('/listing/edit/:id', async (req, res) => {
       property_type_id = ?, room_type_id = ?
       WHERE listing_id = ?`
 
+    // Get IDs of the updated records
     const neighbourhood_id =
       neighbourhoodResult[0].insertId || listing[0].neighbourhood_id
-
     const property_type_id =
       propertyTypeResult[0].insertId || listing[0].property_type_id
     const room_type_id = roomTypeResult[0].insertId || listing[0].room_type_id
@@ -376,7 +397,6 @@ router.post('/listing/edit/:id', async (req, res) => {
       }
     }
 
-    // Assuming you have a success page, you can redirect to it
     res.redirect('/listing/' + listing_id)
   } catch (err) {
     console.error(err)
@@ -390,9 +410,12 @@ router.post('/listing/edit/:id', async (req, res) => {
  */
 router.post('/listing/delete/:id', async (req, res) => {
   try {
+    // SQL query to fetch listing details
     const getListingQuery = `SELECT * FROM listing WHERE listing_id = ? LIMIT 1`
+    // Fetch listing details
     const [listing] = await pool.query(getListingQuery, [req.params.id])
 
+    // SQL queries to delete listing and related records
     const deleteListingAmenityJunctionQuery = `DELETE FROM listing_amenity_junction WHERE listing_id = ?`
     await pool.query(deleteListingAmenityJunctionQuery, [req.params.id])
 
@@ -401,12 +424,13 @@ router.post('/listing/delete/:id', async (req, res) => {
 
     const deleteGeoLocationQuery = `DELETE FROM geo_location WHERE geo_location_id = ?`
     await pool.query(deleteGeoLocationQuery, [listing[0].geo_location_id])
+
     const deleteReviewQuery = `DELETE FROM review WHERE review_id = ?`
     await pool.query(deleteReviewQuery, [listing[0].review_id])
+
     const deleteListingUrlQuery = `DELETE FROM listing_url WHERE listing_url_id = ?`
     await pool.query(deleteListingUrlQuery, [listing[0].listing_url_id])
 
-    console.log('Listing deleted successfully')
     res.redirect('/')
   } catch (err) {
     console.error(err)
@@ -420,16 +444,18 @@ router.post('/listing/delete/:id', async (req, res) => {
  */
 router.get('/', async (req, res) => {
   try {
+    // Pagination variables
     let currPage = parseInt(req.query.currPage) || 1
     let search = req.query.search || ''
     let offset = 15
 
-    // Search where clause
+    // Search where clause for SQL query to fetch listings
     let whereClause = ''
     if (search) {
       whereClause = `WHERE name LIKE '%${search}%' OR neighbourhood LIKE '%${search}%'`
     }
 
+    // SQL query to fetch listings
     let query = `SELECT * FROM listing
                  INNER JOIN listing_url ON listing.listing_url_id = listing_url.listing_url_id
                  INNER JOIN neighbourhood ON neighbourhood.neighbourhood_id = listing.neighbourhood_id
@@ -467,6 +493,7 @@ router.get('/', async (req, res) => {
  */
 router.get('/listing/:id', async (req, res) => {
   try {
+    // SQL query to fetch listing details
     let query = `SELECT listing.*, listing_url.*, host.*, host_url.*, neighbourhood.*, 
                 geo_location.*, property_type.*, room_type.*, review.*,
                 GROUP_CONCAT(amenity.amenity SEPARATOR ', ') AS amenities
