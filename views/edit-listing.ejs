@@ -6,8 +6,8 @@
   <body>
     <%- include('./partials/header', { pageInfo }) %>
     <div class="container my-5">
-      <h1>Create New Listing</h1>
-      <form action="/listing/add-listing" method="post">
+      <h1>Edit Listing</h1>
+      <form action="/listing/edit/<%= listing.listing_id %>" method="post">
         <div class="mb-3 form-group required">
           <label for="name" class="form-label">Name</label>
           <input
@@ -16,6 +16,7 @@
             id="name"
             name="name"
             placeholder="Rental unit in London"
+            value="<%= listing.name %>"
             required
           />
         </div>
@@ -28,7 +29,9 @@
             name="description"
             rows="3"
             placeholder="Description"
-          ></textarea>
+          >
+<%= listing.description %></textarea
+          >
         </div>
         <div class="mb-3">
           <label for="name" class="form-label">Neighbourhood</label>
@@ -38,6 +41,7 @@
             id="neighbourhood"
             name="neighbourhood"
             placeholder="London, United Kingdom"
+            value="<%= listing.neighbourhood %>"
           />
         </div>
         <div class="mb-3">
@@ -50,7 +54,9 @@
             name="neighbourhood_overview"
             rows="3"
             placeholder="Neighbourhood overview"
-          ></textarea>
+          >
+<%= listing.neighbourhood_overview %></textarea
+          >
         </div>
         <div class="mb-3">
           <label for="amenities" class="form-label">Amenities</label>
@@ -60,7 +66,9 @@
             name="amenities"
             rows="3"
             placeholder="Fridge, AC, TV, ..."
-          ></textarea>
+          >
+<%= listing.amenities %></textarea
+          >
         </div>
         <div class="mb-3">
           <label for="accommodates" class="form-label">Accommodates</label>
@@ -70,6 +78,7 @@
             id="accommodates"
             name="accommodates"
             placeholder="00"
+            value="<%= listing.accommodates %>"
           />
         </div>
         <div class="mb-3">
@@ -80,6 +89,7 @@
             id="bedrooms"
             name="bedrooms"
             placeholder="00"
+            value="<%= listing.bedrooms %>"
           />
         </div>
         <div class="mb-3">
@@ -90,6 +100,7 @@
             id="beds"
             name="beds"
             placeholder="00"
+            value="<%= listing.beds %>"
           />
         </div>
         <div class="mb-3">
@@ -100,6 +111,7 @@
             id="latitude"
             name="latitude"
             placeholder="51.509865"
+            value="<%= listing.latitude %>"
           />
         </div>
         <div class="mb-3">
@@ -110,6 +122,7 @@
             id="longitude"
             name="longitude"
             placeholder="-0.118092"
+            value="<%= listing.longitude %>"
           />
         </div>
         <div class="mb-3">
@@ -120,6 +133,7 @@
             id="bathrooms_text"
             name="bathrooms_text"
             placeholder="2 baths"
+            value="<%= listing.bathrooms_text %>"
           />
         </div>
         <div class="mb-3 form-group required">
@@ -131,6 +145,7 @@
             name="room_type"
             placeholder="Type to Search Room Type or Create New Property Type"
             list="room_types"
+            value="<%= listing.room_type %>"
             required
           />
           <datalist id="room_types">
@@ -151,6 +166,7 @@
             name="property_type"
             placeholder="Type to Search Property Type or Create New Property Type"
             list="property_types"
+            value="<%= listing.property_type %>"
             required
           />
           <datalist id="property_types">
@@ -172,6 +188,7 @@
             id="availability_365"
             name="availability_365"
             placeholder="000"
+            value="<%= listing.availability_365 %>"
           />
         </div>
         <div class="mb-3">
@@ -182,6 +199,7 @@
             id="picture_url"
             name="picture_url"
             placeholder="https://example.com/image.jpg"
+            value="<%= listing.picture_url %>"
           />
         </div>
         <div class="mb-3 form-group required">
@@ -192,6 +210,7 @@
             id="price"
             name="price"
             placeholder="Price"
+            value="<%= listing.price %>"
             required
           />
         </div>
@@ -204,6 +223,7 @@
             name="host_id"
             placeholder="Type to Search Hosts"
             list="hosts"
+            value="<%= listing.host_id %>"
             required
           />
           <datalist id="hosts">

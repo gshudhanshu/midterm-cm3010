@@ -31,27 +31,34 @@ CREATE TABLE host_location (
   host_location varchar(255) NULL,
   PRIMARY KEY (host_location_id)
 );
+-- Create the table host_neighbourhood
+CREATE TABLE host_neighbourhood (
+  host_neighbourhood_id int NOT NULL AUTO_INCREMENT,
+  host_neighbourhood varchar(255) UNIQUE NULL,
+  PRIMARY KEY (host_neighbourhood_id)
+);
 
 -- Create the table host
 CREATE TABLE host (
   host_id int NOT NULL AUTO_INCREMENT,
   host_name varchar(255) NOT NULL,
   host_about text(1000) NULL,
-  host_neighbourhood varchar(255) NULL,
   host_total_listings_count int UNSIGNED NULL,
   host_url_id int NOT NULL,
   host_location_id int NULL,
+  host_neighbourhood_id int NULL,
   PRIMARY KEY (host_id),
   FOREIGN KEY (host_url_id) REFERENCES host_url(host_url_id),
-  FOREIGN KEY (host_location_id) REFERENCES host_location(host_location_id)
+  FOREIGN KEY (host_location_id) REFERENCES host_location(host_location_id),
+  FOREIGN KEY (host_neighbourhood_id) REFERENCES host_neighbourhood(host_neighbourhood_id)
 );
 
 
--- Create the table neighborhood
-CREATE TABLE neighborhood (
-  neighborhood_id int NOT NULL AUTO_INCREMENT,
-  neighborhood varchar(255) NULL,
-  PRIMARY KEY (neighborhood_id)
+-- Create the table neighbourhood
+CREATE TABLE neighbourhood (
+  neighbourhood_id int NOT NULL AUTO_INCREMENT,
+  neighbourhood varchar(255) UNIQUE NULL,
+  PRIMARY KEY (neighbourhood_id)
 );
 
 -- Create the table geo_location
@@ -65,14 +72,14 @@ CREATE TABLE geo_location (
 -- Create the property_type table
 CREATE TABLE property_type (
   property_type_id int NOT NULL AUTO_INCREMENT,
-  property_type varchar(255) NULL,
+  property_type varchar(255) UNIQUE NULL,
   PRIMARY KEY (property_type_id)
 );
 
 -- Create the table room_type
 CREATE TABLE room_type (
   room_type_id int NOT NULL AUTO_INCREMENT,
-  room_type varchar(255) NULL,
+  room_type varchar(255) UNIQUE NULL,
   PRIMARY KEY (room_type_id)
 );
 
@@ -96,7 +103,7 @@ CREATE TABLE listing (
   listing_id int NOT NULL AUTO_INCREMENT,
   name varchar(255) NOT NULL,
   description text(1000) NULL,
-  neighborhood_overview text(1000) NULL,
+  neighbourhood_overview text(1000) NULL,
   accommodates int UNSIGNED NULL,
   bedrooms int UNSIGNED NULL,
   beds int UNSIGNED NULL ,
@@ -105,14 +112,14 @@ CREATE TABLE listing (
   price int NOT NULL,
   listing_url_id int NOT NULL,
   host_id int NOT NULL,
-  neighborhood_id int NOT NULL,
+  neighbourhood_id int NOT NULL,
   geo_location_id int NOT NULL,
   property_type_id int NOT NULL,
   room_type_id int NOT NULL,
   review_id int NOT NULL,
   PRIMARY KEY (listing_id),
   FOREIGN KEY (listing_url_id) REFERENCES listing_url(listing_url_id),
-  FOREIGN KEY (neighborhood_id) REFERENCES neighborhood(neighborhood_id),
+  FOREIGN KEY (neighbourhood_id) REFERENCES neighbourhood(neighbourhood_id),
   FOREIGN KEY (geo_location_id) REFERENCES geo_location(geo_location_id),
   FOREIGN KEY (property_type_id) REFERENCES property_type(property_type_id),
   FOREIGN KEY (room_type_id) REFERENCES room_type(room_type_id),

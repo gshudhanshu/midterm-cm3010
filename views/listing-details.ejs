@@ -40,15 +40,15 @@
         </div>
         <div class="col-md-6">
           <h1 class="mb-3"><%= listing.name %></h1>
-          <p><strong>Neighborhood:</strong><%= listing.neighborhood %></p>
+          <p><strong>Neighbourhood: </strong><%= listing.neighbourhood %></p>
           <p>
             <strong>Geo location: </strong>latitude: <%= listing.latitude %>
             longitude: <%= listing.longitude%>
           </p>
           <p>
-            <strong>Neighborhood Overview:</strong>
+            <strong>Neighbourhood Overview:</strong>
           </p>
-          <p><%- listing.neighborhood_overview %></p>
+          <p><%- listing.neighbourhood_overview %></p>
           <p><strong>Accommodates:</strong> <%= listing.accommodates %></p>
           <p><strong>Bedrooms:</strong> <%= listing.bedrooms %></p>
           <p><strong>Beds:</strong> <%= listing.beds %></p>
@@ -67,6 +67,35 @@
           <p><strong>Price:</strong> $<%= listing.price %></p>
           <p><strong>Description:</strong></p>
           <p><%- listing.description %></p>
+          <div class="row gx-3 mb-3">
+            <a
+              class="col btn btn-warning me-3"
+              href="/listing/edit/<%= listing.listing_id %>"
+              >Edit listing</a
+            >
+            <a class="col btn btn-danger" onclick="deleteResource()"
+              >Delete listing</a
+            >
+            <form
+              id="deleteListingForm"
+              style="display: none"
+              method="post"
+              action="/listing/delete/<%= listing.listing_id %>"
+            >
+              <input
+                type="hidden"
+                name="listing_id"
+                id="listing_id"
+                value="<%= listing.listing_id %>"
+              />
+            </form>
+            <script>
+              function deleteResource() {
+                const deleteForm = document.getElementById('deleteListingForm')
+                deleteForm.submit()
+              }
+            </script>
+          </div>
           <div class="row gx-3">
             <a class="col btn btn-primary me-3" href="/"
               >Back to All Listings</a

@@ -16,19 +16,23 @@
         <% listings.forEach(listing => { %>
         <div class="col mb-5">
           <div class="card">
-            <img
-              src="<%= listing.picture_url %>"
-              class="card-img-top"
-              alt="..."
-            />
+            <img src="<%= listing.picture_url %>" class="card-img-top" />
             <div class="card-body">
               <h5 class="card-title"><%= listing.name %></h5>
-              <p class="card-text text-truncate"><%= listing.description %></p>
-              <a
-                href="/listing/<%= listing.listing_id %>"
-                class="btn btn-primary"
-                >View Details</a
-              >
+              <!-- prettier-ignore -->
+              <p class="card-text short-description">
+                <%= listing.description.replace(/<br \/>/g, ' ') %>
+              </p>
+              <div>
+                <h5 class="text-center lh-sm mb-3">
+                  Price: $<%= listing.price %>
+                </h5>
+                <a
+                  href="/listing/<%= listing.listing_id %>"
+                  class="btn btn-primary"
+                  >View Details</a
+                >
+              </div>
             </div>
           </div>
         </div>

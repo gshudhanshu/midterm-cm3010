@@ -10,7 +10,7 @@ const pool = mysql.createPool({
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-  connectionLimit: 10,
+  connectionLimit: 5,
   multipleStatements: true,
 })
 
@@ -19,7 +19,8 @@ const filterData = (arrayOfObj) => {
     listing_url: [],
     host_url: [],
     host_location: [],
-    neighborhood: [],
+    host_neighbourhood: [],
+    neighbourhood: [],
     geo_location: [],
     property_type: [],
     room_type: [],
@@ -43,8 +44,12 @@ const filterData = (arrayOfObj) => {
       host_location: curr.host_location,
     })
 
-    objArr.neighborhood.push({
-      neighborhood: curr.neighborhood,
+    objArr.host_neighbourhood.push({
+      host_neighbourhood: curr.host_neighbourhood,
+    })
+
+    objArr.neighbourhood.push({
+      neighbourhood: curr.neighbourhood,
     })
 
     objArr.geo_location.push({
@@ -73,7 +78,6 @@ const filterData = (arrayOfObj) => {
       host_id: curr.host_id,
       host_name: curr.host_name,
       host_about: curr.host_about,
-      host_neighbourhood: curr.host_neighbourhood,
       host_total_listings_count: curr.host_total_listings_count,
     })
 
@@ -81,7 +85,7 @@ const filterData = (arrayOfObj) => {
       listing_id: curr.listing_id,
       name: curr.name,
       description: curr.description,
-      neighborhood_overview: curr.neighborhood_overview,
+      neighbourhood_overview: curr.neighborhood_overview,
       accommodates: curr.accommodates,
       bedrooms: curr.bedrooms,
       beds: curr.beds,
@@ -101,7 +105,9 @@ async function findOrCreateAmenities(amenityValues) {
   for (const amenityValue of amenityValues) {
     try {
       const [rows] = await pool.query(
-        'INSERT INTO amenity (amenity) VALUES (?) ON DUPLICATE KEY UPDATE amenity_id=LAST_INSERT_ID(amenity_id)',
+        `INSERT INTO amenity (amenity) VALUES (?)
+        ON DUPLICATE KEY UPDATE amenity = VALUES(amenity),
+        amenity_id = LAST_INSERT_ID(amenity_id)`,
         [amenityValue]
       )
 
@@ -124,14 +130,16 @@ async function findOrCreateAmenities(amenityValues) {
   return amenityIds
 }
 
-async function findOrCreate(tableName, data, idColumn = false) {
+async function findOrCreate(tableName, columnName, data, idColumn = false) {
   const keys = Object.keys(data[0])
   const values = data.map((row) =>
     Object.values(row).map((value) => (value === '' ? null : value))
   )
 
   const query = `INSERT INTO ${tableName} (${keys.join(', ')}) VALUES ? 
-                 ON DUPLICATE KEY UPDATE ${idColumn} = VALUES(${idColumn})`
+                 ON DUPLICATE KEY UPDATE ${idColumn} = VALUES(${idColumn}),
+                  ${columnName}_id = LAST_INSERT_ID(${columnName}_id)
+                 `
 
   const [result] = await pool.query(query, [values])
 
@@ -207,6 +215,7 @@ async function bulkInsertData(data) {
     amenityIds: [],
     hostLocationIds: [],
     hostNeighbourhoodIds: [],
+    neighbourhoodIds: [],
     propertyTypeIds: [],
     roomTypeIds: [],
   }
@@ -215,7 +224,7 @@ async function bulkInsertData(data) {
     idsArr.amenityIds.push(amenityIds)
   }
 
-  // Find or create IDs for host_location, neighborhood, property_type, room_type, and host
+  // Find or create IDs for host_location, neighbourhood, property_type, room_type, and host
   for (let i = 0; i < data.listing.length; i++) {
     const hostLocationId = await findOrCreateEntityId(
       'host_location',
@@ -225,11 +234,18 @@ async function bulkInsertData(data) {
     idsArr.hostLocationIds.push(hostLocationId)
 
     const hostNeighbourhoodId = await findOrCreateEntityId(
-      'neighborhood',
-      'neighborhood',
-      data.host[i].host_neighbourhood
+      'host_neighbourhood',
+      'host_neighbourhood',
+      data.host_neighbourhood[i].host_neighbourhood
     )
     idsArr.hostNeighbourhoodIds.push(hostNeighbourhoodId)
+
+    const neighbourhoodId = await findOrCreateEntityId(
+      'neighbourhood',
+      'neighbourhood',
+      data.neighbourhood[i].neighbourhood
+    )
+    idsArr.neighbourhoodIds.push(neighbourhoodId)
 
     const propertyTypeId = await findOrCreateEntityId(
       'property_type',
@@ -249,7 +265,7 @@ async function bulkInsertData(data) {
   // Insert listing_url and store generated listing_url_id
   const listingUrlIds = await insertData('listing_url', data.listing_url)
   const geoLocationIds = await insertData('geo_location', data.geo_location)
-  const neighborhoodIds = await insertData('neighborhood', data.neighborhood)
+  // const neighbourhoodIds = await insertData('neighbourhood', data.neighbourhood)
 
   // Insert host_url and store generated host_url_id
   const hostUrlIds = await insertData('host_url', data.host_url)
@@ -260,15 +276,17 @@ async function bulkInsertData(data) {
   // Now insert host and listing tables, using the generated foreign key values
   const hostIds = await findOrCreate(
     'host',
+    'host',
     data.host.map((row, index) => ({
       ...row,
       host_url_id: hostUrlIds[index],
       host_location_id: idsArr.hostLocationIds[index],
+      host_neighbourhood_id: idsArr.hostNeighbourhoodIds[index],
     })),
     'host_id'
   )
-
   const listingIds = await findOrCreate(
+    'listing',
     'listing',
     data.listing.map((row, index) => ({
       ...row,
@@ -277,7 +295,7 @@ async function bulkInsertData(data) {
       listing_url_id: listingUrlIds[index],
       review_id: reviewIds[index],
       host_id: data.host[index].host_id,
-      neighborhood_id: neighborhoodIds[index],
+      neighbourhood_id: idsArr.neighbourhoodIds[index],
       geo_location_id: geoLocationIds[index],
       property_type_id: idsArr.propertyTypeIds[index],
       room_type_id: idsArr.roomTypeIds[index],

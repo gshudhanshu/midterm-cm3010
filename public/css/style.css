@@ -122,3 +122,34 @@ body {
   content: '*';
   color: red;
 }
+
+.short-description {
+  width: 100%;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  font-weight: normal;
+}
+
+/* .short-description > b {
+  content: '';
+  font-weight: normal;
+}
+
+.short-description > b:after {
+  content: ': ';
+  font-weight: normal;
+}
+
+.short-description > br {
+  display: inline;
+  content: '';
+  clear: none;
+}
+
+.short-description > br::after {
+  display: inline;
+  content: ' ';
+  clear: none;
+} */

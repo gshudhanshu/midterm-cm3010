@@ -35,7 +35,7 @@
           <% if (listings.length === 0) { %>
           <p>No listings available for this host.</p>
           <% } else { %>
-          <ul class="list-group">
+          <ul class="list-group mb-5">
             <% listings.forEach(listing => { %>
             <li class="list-group-item">
               <a href="/listing/<%= listing.listing_id %>"
@@ -45,6 +45,35 @@
             <% }); %>
           </ul>
           <% } %>
+          <div class="row gx-3 mb-3">
+            <a
+              class="col btn btn-warning me-3"
+              href="/host/edit/<%= host.host_id %>"
+              >Edit host</a
+            >
+            <a class="col btn btn-danger" onclick="deleteResource()"
+              >Delete Host</a
+            >
+            <form
+              id="deleteHostForm"
+              style="display: none"
+              method="post"
+              action="/host/delete/<%= host.host_id %>"
+            >
+              <input
+                type="hidden"
+                name="host.host_id"
+                id="host.host_id"
+                value="<%= host.host_id %>"
+              />
+            </form>
+            <script>
+              function deleteResource() {
+                const deleteForm = document.getElementById('deleteHostForm')
+                deleteForm.submit()
+              }
+            </script>
+          </div>
         </div>
       </div>
     </div>
