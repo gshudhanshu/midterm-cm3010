@@ -136,8 +136,7 @@
           <datalist id="room_types">
             <% for (let room_type of room_types) { %>
             <option value="<%= room_type.room_type %>">
-              <%= room_type.room_type %> (Room type ID: <%=
-              room_type.room_type_id %>)
+              <%= room_type.room_type %> (ID: <%= room_type.room_type_id %>)
             </option>
             <% } %>
           </datalist>
@@ -156,7 +155,7 @@
           <datalist id="property_types">
             <% for (let property_type of property_types) { %>
             <option value="<%= property_type.property_type %>">
-              <%= property_type.property_type %> (Property type ID: <%=
+              <%= property_type.property_type %> (ID: <%=
               property_type.property_type_id %>)
             </option>
             <% } %>
@@ -209,7 +208,7 @@
           <datalist id="hosts">
             <% for (let host of hosts) { %>
             <option value="<%= host.host_id %>">
-              <%= host.host_name %> (Host ID: <%= host.host_id %>)
+              <%= host.host_name %> (ID: <%= host.host_id %>)
             </option>
             <% } %>
           </datalist>

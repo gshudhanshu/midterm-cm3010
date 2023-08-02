@@ -162,6 +162,11 @@ router.post('/listing/add-listing', async (req, res) => {
     })
   }
 
+  await pool.query(
+    `UPDATE host SET number_of_listings = number_of_listings + 1 WHERE host_id = ?`,
+    [host_id]
+  )
+
   // Assuming you have a success page, you can redirect to it
   res.redirect('/listing/' + listingResult[0].insertId)
 })
