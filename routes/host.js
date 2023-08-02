@@ -19,7 +19,7 @@ router.get('/add-host', async (req, res) => {
 router.post('/add-host', async (req, res) => {
   try {
     // Get the form data
-    const {
+    let {
       host_name,
       host_about,
       host_neighbourhood,
@@ -98,7 +98,7 @@ router.post('/add-host', async (req, res) => {
 router.post('/edit/:id', async (req, res) => {
   try {
     // Get the form data
-    const {
+    let {
       host_name,
       host_about,
       host_neighbourhood,
@@ -346,6 +346,11 @@ router.get('/:id', async (req, res) => {
     delete hostData.listings
     delete hostData.listing_names
     delete hostData.listing_urls
+
+    if (hostData.host_id) {
+      res.status(404).render('404.ejs', { pageInfo: { title: '404' } })
+      return
+    }
 
     res.render('host', {
       host: hostData,

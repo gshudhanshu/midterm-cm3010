@@ -172,7 +172,7 @@ router.post('/listing/add-listing', async (req, res) => {
 
   // Increment number_of_listings for the host
   await pool.query(
-    `UPDATE host SET number_of_listings = number_of_listings + 1 WHERE host_id = ?`,
+    `UPDATE host SET host_total_listings_count = host_total_listings_count + 1 WHERE host_id = ?`,
     [host_id]
   )
 
@@ -430,7 +430,6 @@ router.post('/listing/delete/:id', async (req, res) => {
 
     const deleteListingUrlQuery = `DELETE FROM listing_url WHERE listing_url_id = ?`
     await pool.query(deleteListingUrlQuery, [listing[0].listing_url_id])
-
     res.redirect('/')
   } catch (err) {
     console.error(err)
@@ -513,6 +512,10 @@ router.get('/listing/:id', async (req, res) => {
                 LIMIT 1`
 
     const [result] = await pool.query(query, [req.params.id])
+    if (result.length === 0) {
+      res.status(404).render('404.ejs', { pageInfo: { title: '404' } })
+      return
+    }
     res.render('listing-details', {
       listing: result[0],
       pageInfo: { title: 'Listing details' },
