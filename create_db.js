@@ -1,5 +1,4 @@
 const fs = require('fs')
-const csvParser = require('csv-parser')
 const mysql = require('mysql2')
 
 const dotenv = require('dotenv')
