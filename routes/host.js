@@ -30,6 +30,14 @@ router.post('/add-host', async (req, res) => {
     // We'll hardcode host_url which is a link to the host's profile on Airbnb
     const host_url = 'https://www.airbnb.co.in'
 
+    // If picture_url is empty, set it to a default value
+    // This image is taken from Wikimedia Commons
+    // https://commons.wikimedia.org/wiki/File:No_Image_Available.jpg
+    host_picture_url =
+      host_picture_url !== ''
+        ? host_picture_url
+        : 'https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg'
+
     // SQL queries to add host related data
     const addHostUrlQuery = `INSERT INTO host_url (host_url, host_picture_url) VALUES (?, ?)`
     const addHostNeighbourhoodQuery = `INSERT INTO host_neighbourhood (host_neighbourhood)
@@ -100,6 +108,14 @@ router.post('/edit/:id', async (req, res) => {
 
     // We'll hardcode host_url which is a link to the host's profile on Airbnb
     const host_url = 'https://www.airbnb.co.in'
+
+    // If picture_url is empty, set it to a default value
+    // This image is taken from Wikimedia Commons
+    // https://commons.wikimedia.org/wiki/File:No_Image_Available.jpg
+    host_picture_url =
+      host_picture_url !== ''
+        ? host_picture_url
+        : 'https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg'
 
     // SQL queries to add host related data
     const updateHostUrlQuery = `UPDATE host_url SET host_url = ?, host_picture_url = ? WHERE host_url_id = ?`
