@@ -28,7 +28,7 @@ CREATE TABLE host_url (
 -- Create the table host_location
 CREATE TABLE host_location (
   host_location_id int NOT NULL AUTO_INCREMENT,
-  host_location varchar(255) NULL,
+  host_location varchar(255) UNIQUE NULL,
   PRIMARY KEY (host_location_id)
 );
 -- Create the table host_neighbourhood
