@@ -11,7 +11,7 @@ const pool = mysql.createPool({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   port: process.env.DB_PORT,
-  connectionLimit: 3,
+  connectionLimit: 2,
   multipleStatements: true,
 })
 
@@ -223,7 +223,7 @@ async function insertListingAmenityJunction(listingIds, amenityIds) {
 async function bulkInsertData(data) {
   let idsArr = {
     amenityIds: [],
-    hostLocationIds: [],
+    hostCountryIds: [],
     hostNeighbourhoodIds: [],
     neighbourhoodIds: [],
     propertyTypeIds: [],
@@ -238,12 +238,12 @@ async function bulkInsertData(data) {
 
   // Find or create IDs for host_country, neighbourhood, property_type, room_type, and host
   for (let i = 0; i < data.listing.length; i++) {
-    const hostLocationId = await findOrCreateEntityId(
+    const hostCountryId = await findOrCreateEntityId(
       'host_country',
       'host_country',
       data.host_country[i].host_country
     )
-    idsArr.hostLocationIds.push(hostLocationId)
+    idsArr.hostCountryIds.push(hostCountryId)
 
     const hostNeighbourhoodId = await findOrCreateEntityId(
       'host_neighbourhood',
@@ -292,7 +292,7 @@ async function bulkInsertData(data) {
     data.host.map((row, index) => ({
       ...row,
       host_url_id: hostUrlIds[index],
-      host_country_id: idsArr.hostLocationIds[index],
+      host_country_id: idsArr.hostCountryIds[index],
       host_neighbourhood_id: idsArr.hostNeighbourhoodIds[index],
     })),
     'host_id'

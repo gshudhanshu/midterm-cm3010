@@ -38,8 +38,17 @@
             class="form-control"
             id="host_neighbourhood"
             name="host_neighbourhood"
-            placeholder="Neightborhood"
+            list="host_neighbourhoods"
+            placeholder="Type to Select Neighbourhood Or Create New Neighbourhood"
           />
+          <datalist id="host_neighbourhoods">
+            <% for (let host_neighbourhood of host_neighbourhoods) { %>
+            <option value="<%= host_neighbourhood.host_neighbourhood %>">
+              <%= host_neighbourhood.host_neighbourhood %> (ID: <%=
+              host_neighbourhood.host_neighbourhood_id %>)
+            </option>
+            <% } %>
+          </datalist>
         </div>
         <div class="mb-3">
           <label for="host_picture_url" class="form-label"
@@ -62,8 +71,17 @@
             class="form-control"
             id="host_country"
             name="host_country"
-            placeholder="City, Country"
+            list="host_countries"
+            placeholder="Type to Select Country Or Create New Country"
           />
+          <datalist id="host_countries">
+            <% for (let host_country of host_countries) { %>
+            <option value="<%= host_country.host_country %>">
+              <%= host_country.host_country %> (ID: <%=
+              host_country.host_country_id %>)
+            </option>
+            <% } %>
+          </datalist>
         </div>
 
         <button type="submit" class="btn btn-primary">Submit</button>

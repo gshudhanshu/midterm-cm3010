@@ -7,9 +7,22 @@ const pool = require('../dbconnection')
  * Add new host page
  */
 router.get('/add-host', async (req, res) => {
-  res.render('add-host', {
-    pageInfo: { title: 'Add new host' },
-  })
+  try {
+    // Get host locations and host neighbourhoods
+    const [host_countries] = await pool.query('SELECT * FROM host_country')
+    const [host_neighbourhoods] = await pool.query(
+      'SELECT * FROM host_neighbourhood'
+    )
+
+    res.render('add-host', {
+      host_countries: host_countries,
+      host_neighbourhoods: host_neighbourhoods,
+      pageInfo: { title: 'Add new host' },
+    })
+  } catch (err) {
+    console.error('Error fetching host details:', err)
+    res.status(500).send('Error fetching host details')
+  }
 })
 
 /**
@@ -44,7 +57,7 @@ router.post('/add-host', async (req, res) => {
                                        VALUES (?)
                                        ON DUPLICATE KEY UPDATE host_neighbourhood = VALUES(host_neighbourhood),
                                        host_neighbourhood_id = LAST_INSERT_ID(host_neighbourhood_id)`
-    const addHostLocationQuery = `
+    const addHostCountryQuery = `
       INSERT INTO host_country (host_country)
       VALUES (?)
       ON DUPLICATE KEY UPDATE host_country = VALUES(host_country),
@@ -64,9 +77,7 @@ router.post('/add-host', async (req, res) => {
     const host_neighbourhood_id = neighbourhoodResult[0].insertId
 
     // Execute the host_country query
-    const locationResult = await pool.query(addHostLocationQuery, [
-      host_country,
-    ])
+    const locationResult = await pool.query(addHostCountryQuery, [host_country])
     const host_country_id = locationResult[0].insertId
 
     // Insert the new host into the host table
@@ -123,7 +134,7 @@ router.post('/edit/:id', async (req, res) => {
                                        VALUES (?)
                                        ON DUPLICATE KEY UPDATE host_neighbourhood = VALUES(host_neighbourhood),
                                        host_neighbourhood_id = LAST_INSERT_ID(host_neighbourhood_id)`
-    const addHostLocationQuery = `
+    const addHostCountryQuery = `
       INSERT INTO host_country (host_country)
       VALUES (?)
       ON DUPLICATE KEY UPDATE host_country = VALUES(host_country),
@@ -151,9 +162,7 @@ router.post('/edit/:id', async (req, res) => {
     const host_neighbourhood_id = neighbourhoodResult[0].insertId
 
     // Execute the host_country query
-    const locationResult = await pool.query(addHostLocationQuery, [
-      host_country,
-    ])
+    const locationResult = await pool.query(addHostCountryQuery, [host_country])
     const host_country_id = locationResult[0].insertId
 
     // Update the new host into the host table
@@ -217,13 +226,13 @@ router.post('/delete/:id', async (req, res) => {
     // SQL queries to delete host related data
     const deleteHostUrlQuery = `DELETE FROM host_url WHERE host_url_id = ?`
     const deleteHostNeighbourhoodQuery = `DELETE FROM host_neighbourhood WHERE host_neighbourhood_id = ?`
-    const deleteHostLocationQuery = `DELETE FROM host_country WHERE host_country_id = ?`
+    const deleteHostCountryQuery = `DELETE FROM host_country WHERE host_country_id = ?`
     const deleteHostQuery = `DELETE FROM host WHERE host_id = ?`
 
     // Delete host related data
     await pool.query(deleteHostUrlQuery, [host_id])
     await pool.query(deleteHostNeighbourhoodQuery, [host_id])
-    await pool.query(deleteHostLocationQuery, [host_id])
+    await pool.query(deleteCountryQuery, [host_id])
     await pool.query(deleteHostQuery, [host_id])
 
     res.redirect('/')
@@ -280,13 +289,13 @@ router.get('/edit/:id', async (req, res) => {
     }
 
     // Get host locations and host neighbourhoods
-    const [host_countrys] = await pool.query('SELECT * FROM host_country')
+    const [host_countries] = await pool.query('SELECT * FROM host_country')
     const [host_neighbourhoods] = await pool.query(
       'SELECT * FROM host_neighbourhood'
     )
 
     res.render('edit-host', {
-      host_countrys: host_countrys,
+      host_countries: host_countries,
       host_neighbourhoods: host_neighbourhoods,
       host: hostData,
       pageInfo: { title: 'Edit host' },
