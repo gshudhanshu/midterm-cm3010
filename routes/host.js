@@ -24,7 +24,7 @@ router.post('/add-host', async (req, res) => {
       host_about,
       host_neighbourhood,
       host_picture_url,
-      host_location,
+      host_country,
     } = req.body
 
     // We'll hardcode host_url which is a link to the host's profile on Airbnb
@@ -45,10 +45,10 @@ router.post('/add-host', async (req, res) => {
                                        ON DUPLICATE KEY UPDATE host_neighbourhood = VALUES(host_neighbourhood),
                                        host_neighbourhood_id = LAST_INSERT_ID(host_neighbourhood_id)`
     const addHostLocationQuery = `
-      INSERT INTO host_location (host_location)
+      INSERT INTO host_country (host_country)
       VALUES (?)
-      ON DUPLICATE KEY UPDATE host_location = VALUES(host_location),
-      host_location_id = LAST_INSERT_ID(host_location_id)`
+      ON DUPLICATE KEY UPDATE host_country = VALUES(host_country),
+      host_country_id = LAST_INSERT_ID(host_country_id)`
 
     // Execute the host_url query
     const urlResult = await pool.query(addHostUrlQuery, [
@@ -63,22 +63,22 @@ router.post('/add-host', async (req, res) => {
     ])
     const host_neighbourhood_id = neighbourhoodResult[0].insertId
 
-    // Execute the host_location query
+    // Execute the host_country query
     const locationResult = await pool.query(addHostLocationQuery, [
-      host_location,
+      host_country,
     ])
-    const host_location_id = locationResult[0].insertId
+    const host_country_id = locationResult[0].insertId
 
     // Insert the new host into the host table
     const insertHostQuery = `INSERT INTO host (host_name, host_about, host_total_listings_count,
-    host_url_id,host_neighbourhood_id, host_location_id) VALUES (?, ?, ?, ?, ?, ?)`
+    host_url_id,host_neighbourhood_id, host_country_id) VALUES (?, ?, ?, ?, ?, ?)`
     const result = await pool.query(insertHostQuery, [
       host_name,
       host_about,
       0,
       host_url_id,
       host_neighbourhood_id,
-      host_location_id,
+      host_country_id,
     ])
 
     const newHostId = result[0].insertId
@@ -103,7 +103,7 @@ router.post('/edit/:id', async (req, res) => {
       host_about,
       host_neighbourhood,
       host_picture_url,
-      host_location,
+      host_country,
     } = req.body
 
     // We'll hardcode host_url which is a link to the host's profile on Airbnb
@@ -124,10 +124,10 @@ router.post('/edit/:id', async (req, res) => {
                                        ON DUPLICATE KEY UPDATE host_neighbourhood = VALUES(host_neighbourhood),
                                        host_neighbourhood_id = LAST_INSERT_ID(host_neighbourhood_id)`
     const addHostLocationQuery = `
-      INSERT INTO host_location (host_location)
+      INSERT INTO host_country (host_country)
       VALUES (?)
-      ON DUPLICATE KEY UPDATE host_location = VALUES(host_location),
-      host_location_id = LAST_INSERT_ID(host_location_id)`
+      ON DUPLICATE KEY UPDATE host_country = VALUES(host_country),
+      host_country_id = LAST_INSERT_ID(host_country_id)`
 
     // Get the host data from the database
     const host_id = req.params.id
@@ -150,21 +150,21 @@ router.post('/edit/:id', async (req, res) => {
     ])
     const host_neighbourhood_id = neighbourhoodResult[0].insertId
 
-    // Execute the host_location query
+    // Execute the host_country query
     const locationResult = await pool.query(addHostLocationQuery, [
-      host_location,
+      host_country,
     ])
-    const host_location_id = locationResult[0].insertId
+    const host_country_id = locationResult[0].insertId
 
     // Update the new host into the host table
     const updateHostQuery = `UPDATE host SET host_name = ?, host_about = ?,
-    host_url_id = ?, host_neighbourhood_id = ?, host_location_id = ? WHERE host_id = ?`
+    host_url_id = ?, host_neighbourhood_id = ?, host_country_id = ? WHERE host_id = ?`
     const result = await pool.query(insertHostQuery, [
       host_name,
       host_about,
       host_url_id,
       host_neighbourhood_id,
-      host_location_id,
+      host_country_id,
       host_id,
     ])
 
@@ -217,7 +217,7 @@ router.post('/delete/:id', async (req, res) => {
     // SQL queries to delete host related data
     const deleteHostUrlQuery = `DELETE FROM host_url WHERE host_url_id = ?`
     const deleteHostNeighbourhoodQuery = `DELETE FROM host_neighbourhood WHERE host_neighbourhood_id = ?`
-    const deleteHostLocationQuery = `DELETE FROM host_location WHERE host_location_id = ?`
+    const deleteHostLocationQuery = `DELETE FROM host_country WHERE host_country_id = ?`
     const deleteHostQuery = `DELETE FROM host WHERE host_id = ?`
 
     // Delete host related data
@@ -242,13 +242,13 @@ router.get('/edit/:id', async (req, res) => {
     // Get ID of the host to be edited
     const host_id = req.params.id
     // SQL query to get host details
-    const query = `SELECT host.*, host_url.*, host_location.*, host_neighbourhood.*,
+    const query = `SELECT host.*, host_url.*, host_country.*, host_neighbourhood.*,
                    GROUP_CONCAT(DISTINCT listing.listing_id SEPARATOR ', ') AS listings,
                    GROUP_CONCAT(DISTINCT listing.name SEPARATOR ', ') AS listing_names,
                    GROUP_CONCAT(DISTINCT listing_url.listing_url SEPARATOR ', ') AS listing_urls
                    FROM host
                    LEFT JOIN host_url ON host.host_url_id = host_url.host_url_id
-                   LEFT JOIN host_location ON host.host_location_id = host_location.host_location_id
+                   LEFT JOIN host_country ON host.host_country_id = host_country.host_country_id
                    LEFT JOIN host_neighbourhood ON host.host_neighbourhood_id = host_neighbourhood.host_neighbourhood_id
                    LEFT JOIN listing ON host.host_id = listing.host_id
                    LEFT JOIN listing_url ON listing.listing_url_id = listing_url.listing_url_id
@@ -280,13 +280,13 @@ router.get('/edit/:id', async (req, res) => {
     }
 
     // Get host locations and host neighbourhoods
-    const [host_locations] = await pool.query('SELECT * FROM host_location')
+    const [host_countrys] = await pool.query('SELECT * FROM host_country')
     const [host_neighbourhoods] = await pool.query(
       'SELECT * FROM host_neighbourhood'
     )
 
     res.render('edit-host', {
-      host_locations: host_locations,
+      host_countrys: host_countrys,
       host_neighbourhoods: host_neighbourhoods,
       host: hostData,
       pageInfo: { title: 'Edit host' },
@@ -305,13 +305,13 @@ router.get('/:id', async (req, res) => {
     // Get ID of the host to be fetched
     const host_id = req.params.id
     // SQL query to get host details
-    const query = `SELECT host.*, host_url.*, host_location.*, host_neighbourhood.*,
+    const query = `SELECT host.*, host_url.*, host_country.*, host_neighbourhood.*,
                    GROUP_CONCAT(DISTINCT listing.listing_id SEPARATOR ', ') AS listings,
                    GROUP_CONCAT(DISTINCT listing.name SEPARATOR ', ') AS listing_names,
                    GROUP_CONCAT(DISTINCT listing_url.listing_url SEPARATOR ', ') AS listing_urls
                    FROM host
                    LEFT JOIN host_url ON host.host_url_id = host_url.host_url_id
-                   LEFT JOIN host_location ON host.host_location_id = host_location.host_location_id
+                   LEFT JOIN host_country ON host.host_country_id = host_country.host_country_id
                    LEFT JOIN host_neighbourhood ON host.host_neighbourhood_id = host_neighbourhood.host_neighbourhood_id
                    LEFT JOIN listing ON host.host_id = listing.host_id
                    LEFT JOIN listing_url ON listing.listing_url_id = listing_url.listing_url_id

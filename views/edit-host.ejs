@@ -69,23 +69,23 @@
           />
         </div>
         <div class="mb-3">
-          <label for="host_location" class="form-label"
-            >Host Location (Origin)
+          <label for="host_country" class="form-label"
+            >Host Country (Origin)
           </label>
           <input
             type="text"
             class="form-control"
-            id="host_location"
-            name="host_location"
-            list="host_locations"
+            id="host_country"
+            name="host_country"
+            list="host_countrys"
             placeholder="Type to Select Location Or Create New Location"
-            value="<%= host.host_location %>"
+            value="<%= host.host_country %>"
           />
-          <datalist id="host_locations">
-            <% for (let host_location of host_locations) { %>
-            <option value="<%= host_location.host_location %>">
-              <%= host_location.host_location %> (ID: <%=
-              host_location.host_location_id %>)
+          <datalist id="host_countrys">
+            <% for (let host_country of host_countrys) { %>
+            <option value="<%= host_country.host_country %>">
+              <%= host_country.host_country %> (ID: <%=
+              host_country.host_country_id %>)
             </option>
             <% } %>
           </datalist>

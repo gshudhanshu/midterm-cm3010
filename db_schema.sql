@@ -25,11 +25,11 @@ CREATE TABLE host_url (
   PRIMARY KEY (host_url_id)
 );
 
--- Create the table host_location
-CREATE TABLE host_location (
-  host_location_id int NOT NULL AUTO_INCREMENT,
-  host_location varchar(255) UNIQUE NULL,
-  PRIMARY KEY (host_location_id)
+-- Create the table host_country
+CREATE TABLE host_country (
+  host_country_id int NOT NULL AUTO_INCREMENT,
+  host_country varchar(255) UNIQUE NULL,
+  PRIMARY KEY (host_country_id)
 );
 -- Create the table host_neighbourhood
 CREATE TABLE host_neighbourhood (
@@ -45,11 +45,11 @@ CREATE TABLE host (
   host_about text(1000) NULL,
   host_total_listings_count int UNSIGNED NULL,
   host_url_id int NOT NULL,
-  host_location_id int NULL,
+  host_country_id int NULL,
   host_neighbourhood_id int NULL,
   PRIMARY KEY (host_id),
   FOREIGN KEY (host_url_id) REFERENCES host_url(host_url_id),
-  FOREIGN KEY (host_location_id) REFERENCES host_location(host_location_id),
+  FOREIGN KEY (host_country_id) REFERENCES host_country(host_country_id),
   FOREIGN KEY (host_neighbourhood_id) REFERENCES host_neighbourhood(host_neighbourhood_id)
 );
 

@@ -11,7 +11,7 @@ const pool = mysql.createPool({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   port: process.env.DB_PORT,
-  connectionLimit: 5,
+  connectionLimit: 3,
   multipleStatements: true,
 })
 
@@ -21,7 +21,7 @@ const filterData = (arrayOfObj) => {
   objArr = {
     listing_url: [],
     host_url: [],
-    host_location: [],
+    host_country: [],
     host_neighbourhood: [],
     neighbourhood: [],
     geo_location: [],
@@ -45,8 +45,8 @@ const filterData = (arrayOfObj) => {
       host_picture_url: curr.host_picture_url,
     })
 
-    objArr.host_location.push({
-      host_location: curr.host_location,
+    objArr.host_country.push({
+      host_country: curr.host_country,
     })
 
     objArr.host_neighbourhood.push({
@@ -54,7 +54,7 @@ const filterData = (arrayOfObj) => {
     })
 
     objArr.neighbourhood.push({
-      neighbourhood: curr.neighbourhood,
+      neighbourhood: curr.neighbourhood_cleansed,
     })
 
     objArr.geo_location.push({
@@ -236,12 +236,12 @@ async function bulkInsertData(data) {
     idsArr.amenityIds.push(amenityIds)
   }
 
-  // Find or create IDs for host_location, neighbourhood, property_type, room_type, and host
+  // Find or create IDs for host_country, neighbourhood, property_type, room_type, and host
   for (let i = 0; i < data.listing.length; i++) {
     const hostLocationId = await findOrCreateEntityId(
-      'host_location',
-      'host_location',
-      data.host_location[i].host_location
+      'host_country',
+      'host_country',
+      data.host_country[i].host_country
     )
     idsArr.hostLocationIds.push(hostLocationId)
 
@@ -292,7 +292,7 @@ async function bulkInsertData(data) {
     data.host.map((row, index) => ({
       ...row,
       host_url_id: hostUrlIds[index],
-      host_location_id: idsArr.hostLocationIds[index],
+      host_country_id: idsArr.hostLocationIds[index],
       host_neighbourhood_id: idsArr.hostNeighbourhoodIds[index],
     })),
     'host_id'
