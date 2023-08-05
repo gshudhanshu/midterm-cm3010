@@ -5,31 +5,25 @@
   </head>
   <body>
     <%- include('./partials/header', {pageInfo, search}) %>
-
     <h1 class="m-5 text-center">All Listings</h1>
     <% if (listings.length === 0) { %>
     <p class="text-center mb-5">No listings available.</p>
     <% } else { %> <% var searchUrl = `?search=${encodeURIComponent(search)}` %>
     <div class="container">
       <div class="row gx-4">
-        <div class="col-3">
-          <h5 class="card-title">Sort Listings</h5>
+        <div class="col-12 col-md-3">
+          <h5 class="card-title">Sort</h5>
           <div class="my-4">
             <form action="/" method="get">
               <div class="mb-3">
                 <label for="sort" class="form-label">Sort By</label>
-                <select
-                  class="form-select"
-                  id="sort"
-                  name="sort"
-                  value="<%=sort%>"
-                >
-                <option value="" <% if (sort === '') { %>selected<% } %>>None</option>
-                <option value="price_asc" <% if (sort === 'price_asc') { %>selected<% } %>>Price (Low to High)</option>
-                <option value="price_desc" <% if (sort === 'price_desc') { %>selected<% } %>>Price (High to Low)</option>
-                <option value="rating_asc" <% if (sort === 'rating_asc') { %>selected<% } %>>Rating (Low to High)</option>
-                <option value="rating_desc" <% if (sort === 'rating_desc') { %>selected<% } %>>Rating (High to Low)</option>
-                              </select>
+                <select class="form-select" id="sort" name="sort">
+                  <option value="" <%= sort === '' ? 'selected' : '' %>>None</option>
+                  <option value="price_asc" <%= sort === 'price_asc' ? 'selected' : '' %> >Price (Low to High)</option>
+                  <option value="price_desc" <%= sort === 'price_desc' ? 'selected' : '' %>>Price (High to Low)</option>
+                  <option value="rating_asc" <%= sort === 'rating_asc' ? 'selected' : '' %>>Rating (Low to High)</option>
+                  <option value="rating_desc" <%= sort === 'rating_desc' ? 'selected' : '' %>>Rating (High to Low)</option>
+                </select>
                 <input type="hidden" name="search" value="<%=search%>" />
               </div>
               <button type="submit" class="btn btn-primary">Sort</button>
@@ -55,7 +49,7 @@
             <h6>Popular amenities</h6>
             <% topAmenities.forEach((amenity) => { %>
             <div><%= amenity.amenity %> (<%= amenity.count %>)</div>
-            <% }); %>
+            <% }) %>
           </div>
         </div>
         <div class="col">

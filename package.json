@@ -20,5 +20,8 @@
     "express": "^4.18.2",
     "fs": "^0.0.1-security",
     "mysql2": "^3.5.2"
+  },
+  "devDependencies": {
+    "prettier-plugin-ejs": "^0.0.14"
   }
 }
