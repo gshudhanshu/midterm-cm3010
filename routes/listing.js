@@ -285,7 +285,8 @@ router.post('/listing/edit/:id', async (req, res) => {
                                  SET listing_url = ?, picture_url = ?
                                  WHERE listing_url_id = ?`
 
-    const updateGeoLocationQuery = `UPDATE geo_location SET latitude = ?, longitude = ? WHERE geo_location_id = ?`
+    const updateGeoLocationQuery = `UPDATE geo_location SET latitude = ?, longitude = ?
+                                    WHERE geo_location_id = ?`
 
     const addPropertyTypeQuery = `INSERT INTO property_type (property_type)
                                   VALUES (?)
@@ -469,23 +470,29 @@ router.get('/', async (req, res) => {
 
     // SQL query to fetch top 5 common amenities
     let topAmenitiesQuery = `SELECT amenity, COUNT(*) AS count FROM listing_amenity_junction
-                              INNER JOIN amenity ON listing_amenity_junction.amenity_id = amenity.amenity_id
-                              GROUP BY amenity
-                              ORDER BY count DESC
-                              LIMIT 5`
+                             INNER JOIN amenity ON
+                             listing_amenity_junction.amenity_id = amenity.amenity_id
+                             GROUP BY amenity
+                             ORDER BY count DESC
+                             LIMIT 5`
 
     const [topAmenities] = await pool.query(topAmenitiesQuery)
 
     // SQL query to fetch top 5 common neighbourhoods
     let topNeighbourhoodsQuery = `SELECT neighbourhood, COUNT(*) AS count FROM listing
-                                  INNER JOIN neighbourhood ON listing.neighbourhood_id = neighbourhood.neighbourhood_id
+                                  INNER JOIN neighbourhood ON
+                                  listing.neighbourhood_id = neighbourhood.neighbourhood_id
                                   GROUP BY neighbourhood
                                   ORDER BY count DESC
                                   LIMIT 5`
+
     const [topNeighbourhoods] = await pool.query(topNeighbourhoodsQuery)
 
     // SQL for min, max and avg price
-    let minMaxAvgPriceQuery = `SELECT CEIL(MIN(price)) AS min_price, CEIL(MAX(price)) AS max_price, CEIL(AVG(price)) AS avg_price FROM listing`
+    let minMaxAvgPriceQuery = `SELECT CEIL(MIN(price)) AS min_price,
+                               CEIL(MAX(price)) AS max_price,
+                               CEIL(AVG(price)) AS avg_price FROM listing`
+
     const [minMaxAvgPrice] = await pool.query(minMaxAvgPriceQuery)
 
     // Search where clause for SQL query to fetch listings

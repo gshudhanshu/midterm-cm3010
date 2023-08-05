@@ -321,7 +321,8 @@ router.get('/:id', async (req, res) => {
                    FROM host
                    LEFT JOIN host_url ON host.host_url_id = host_url.host_url_id
                    LEFT JOIN host_country ON host.host_country_id = host_country.host_country_id
-                   LEFT JOIN host_neighbourhood ON host.host_neighbourhood_id = host_neighbourhood.host_neighbourhood_id
+                   LEFT JOIN host_neighbourhood ON
+                   host.host_neighbourhood_id = host_neighbourhood.host_neighbourhood_id
                    LEFT JOIN listing ON host.host_id = listing.host_id
                    LEFT JOIN listing_url ON listing.listing_url_id = listing_url.listing_url_id
                    WHERE host.host_id = ?
