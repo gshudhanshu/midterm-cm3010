@@ -11,7 +11,7 @@ const pool = mysql.createPool({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   port: process.env.DB_PORT,
-  connectionLimit: 2,
+  connectionLimit: 1,
   multipleStatements: true,
 })
 
@@ -357,8 +357,6 @@ async function readCSVFile(filePath, chunkSize) {
 
     // Process each row from the CSV file
     parser.on('data', async (row) => {
-      // row.amenities = row.amenities.replace(/'/g, '"').split(',')
-      // row.amenities = row.amenities.replace(/\[|\]/g, '').split(',')
       row.amenities = JSON.parse(row.amenities)
       // console.log(row.amenities)
       rows.push(row)

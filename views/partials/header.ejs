@@ -49,12 +49,14 @@
           <label class="visually-hidden" for="inlineFormInputGroupUsername"
             >Username</label
           >
+          <% if(typeof search !== 'undefined'){ var search = "" } %>
           <input
             type="text"
             name="search"
             id="search"
             class="form-control form-control-dark"
             placeholder="Search..."
+            value="<%= search %>"
             aria-label="Search"
           />
         </div>

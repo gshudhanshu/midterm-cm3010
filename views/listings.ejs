@@ -4,39 +4,92 @@
     <%- include('./partials/head', {pageInfo}) %>
   </head>
   <body>
-    <%- include('./partials/header', {pageInfo}) %>
+    <%- include('./partials/header', {pageInfo, search}) %>
 
     <h1 class="m-5 text-center">All Listings</h1>
     <% if (listings.length === 0) { %>
     <p class="text-center mb-5">No listings available.</p>
-    <% } else { %>
-
-    <div class="container text-center">
-      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3">
-        <% listings.forEach(listing => { %>
-        <div class="col mb-5">
-          <div class="card">
-            <img src="<%= listing.picture_url %>" class="card-img-top" />
-            <div class="card-body">
-              <h5 class="card-title"><%= listing.name %></h5>
-              <!-- prettier-ignore -->
-              <p class="card-text short-description">
-                <%= listing.description.replace(/<br \/>/g, ' ') %>
-              </p>
-              <div>
-                <h5 class="text-center lh-sm mb-3">
-                  Price: $<%= listing.price %>
-                </h5>
-                <a
-                  href="/listing/<%= listing.listing_id %>"
-                  class="btn btn-primary"
-                  >View Details</a
+    <% } else { %> <% var searchUrl = `?search=${encodeURIComponent(search)}` %>
+    <div class="container">
+      <div class="row gx-4">
+        <div class="col-3">
+          <h5 class="card-title">Sort Listings</h5>
+          <div class="my-4">
+            <form action="/" method="get">
+              <div class="mb-3">
+                <label for="sort" class="form-label">Sort By</label>
+                <select
+                  class="form-select"
+                  id="sort"
+                  name="sort"
+                  value="<%=sort%>"
                 >
+                <option value="" <% if (sort === '') { %>selected<% } %>>None</option>
+                <option value="price_asc" <% if (sort === 'price_asc') { %>selected<% } %>>Price (Low to High)</option>
+                <option value="price_desc" <% if (sort === 'price_desc') { %>selected<% } %>>Price (High to Low)</option>
+                <option value="rating_asc" <% if (sort === 'rating_asc') { %>selected<% } %>>Rating (Low to High)</option>
+                <option value="rating_desc" <% if (sort === 'rating_desc') { %>selected<% } %>>Rating (High to Low)</option>
+                              </select>
+                <input type="hidden" name="search" value="<%=search%>" />
               </div>
+              <button type="submit" class="btn btn-primary">Sort</button>
+            </form>
+          </div>
+          <h5 class="card-title">Information</h5>
+          <div class="my-4">
+            <h6>Pricing</h6>
+            <div>Min: $<%= minMaxAvgPrice.min_price %></div>
+            <div>Avg: $<%= minMaxAvgPrice.avg_price %></div>
+            <div>Max: $<%= minMaxAvgPrice.max_price %></div>
+          </div>
+
+          <div class="my-4">
+            <h6>Popular Neighbourhoods</h6>
+            <% topNeighbourhoods.forEach((neighbourhood) => { %>
+            <div>
+              <%= neighbourhood.neighbourhood %> (<%= neighbourhood.count %>)
             </div>
+            <% }); %>
+          </div>
+          <div class="my-4">
+            <h6>Popular amenities</h6>
+            <% topAmenities.forEach((amenity) => { %>
+            <div><%= amenity.amenity %> (<%= amenity.count %>)</div>
+            <% }); %>
           </div>
         </div>
-        <% }); %>
+        <div class="col">
+          <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3">
+            <% listings.forEach(listing => { %>
+            <div class="col mb-5">
+              <div class="card text-center">
+                <img
+                  src="<%= listing.picture_url %>"
+                  class="card-img-top"
+                  style="height: 200px; object-fit: cover"
+                />
+                <div class="card-body">
+                  <h5 class="card-title"><%= listing.name %></h5>
+                  <!-- prettier-ignore -->
+                  <p class="card-text short-description">
+                    <%= listing.description.replace(/<br \/>|<\/?b>/g, ' ') %>
+                  </p>
+                  <div>
+                    <h5 class="text-center lh-sm mb-3">
+                      Price: $<%= listing.price %>
+                    </h5>
+                    <a
+                      href="/listing/<%= listing.listing_id %>"
+                      class="btn btn-primary"
+                      >View Details</a
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+            <% }); %>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -45,8 +98,7 @@
     <!-- https://evdokimovm.github.io/javascript/nodejs/mongodb/pagination/expressjs/ejs/bootstrap/2017/08/20/create-pagination-with-nodejs-mongodb-express-and-ejs-step-by-step-from-scratch.html -->
 
     <div>
-      <% var searchUrl = `?search=${encodeURIComponent(search)}` %> <% if
-      (pagination.totalPages > 0) { %>
+      <% if (pagination.totalPages > 0) { %>
       <nav class="mb-5">
         <ul class="pagination text-center justify-content-center">
           <% if (pagination.currPage == 1) { %>

@@ -446,7 +446,47 @@ router.get('/', async (req, res) => {
     // Pagination variables
     let currPage = parseInt(req.query.currPage) || 1
     let search = req.query.search || ''
-    let offset = 15
+    let offset = 18
+    let sort = req.query.sort || ''
+
+    let sortQuery = ''
+    switch (sort) {
+      case 'price_asc':
+        sortQuery = 'ORDER BY price ASC'
+        break
+      case 'price_desc':
+        sortQuery = 'ORDER BY price DESC'
+        break
+      case 'rating_asc':
+        sortQuery = 'ORDER BY review_scores_rating ASC'
+        break
+      case 'rating_desc':
+        sortQuery = 'ORDER BY review_scores_rating DESC'
+        break
+      default:
+        sortQuery = ''
+    }
+
+    // SQL query to fetch top 5 common amenities
+    let topAmenitiesQuery = `SELECT amenity, COUNT(*) AS count FROM listing_amenity_junction
+                              INNER JOIN amenity ON listing_amenity_junction.amenity_id = amenity.amenity_id
+                              GROUP BY amenity
+                              ORDER BY count DESC
+                              LIMIT 5`
+
+    const [topAmenities] = await pool.query(topAmenitiesQuery)
+
+    // SQL query to fetch top 5 common neighbourhoods
+    let topNeighbourhoodsQuery = `SELECT neighbourhood, COUNT(*) AS count FROM listing
+                                  INNER JOIN neighbourhood ON listing.neighbourhood_id = neighbourhood.neighbourhood_id
+                                  GROUP BY neighbourhood
+                                  ORDER BY count DESC
+                                  LIMIT 5`
+    const [topNeighbourhoods] = await pool.query(topNeighbourhoodsQuery)
+
+    // SQL for min, max and avg price
+    let minMaxAvgPriceQuery = `SELECT CEIL(MIN(price)) AS min_price, CEIL(MAX(price)) AS max_price, CEIL(AVG(price)) AS avg_price FROM listing`
+    const [minMaxAvgPrice] = await pool.query(minMaxAvgPriceQuery)
 
     // Search where clause for SQL query to fetch listings
     let whereClause = ''
@@ -456,9 +496,11 @@ router.get('/', async (req, res) => {
 
     // SQL query to fetch listings
     let query = `SELECT * FROM listing
-                 INNER JOIN listing_url ON listing.listing_url_id = listing_url.listing_url_id
-                 INNER JOIN neighbourhood ON neighbourhood.neighbourhood_id = listing.neighbourhood_id
+                 LEFT JOIN listing_url ON listing.listing_url_id = listing_url.listing_url_id
+                 LEFT JOIN neighbourhood ON neighbourhood.neighbourhood_id = listing.neighbourhood_id
+                 LEFT JOIN review ON listing.review_id = review.review_id
                  ${whereClause}
+                 ${sortQuery}
                  LIMIT ${offset} OFFSET ${(currPage - 1) * offset}`
 
     // Query to get the total count of records in the `listing` table
@@ -473,6 +515,10 @@ router.get('/', async (req, res) => {
     res.render('listings', {
       listings: result,
       search,
+      sort,
+      topAmenities,
+      topNeighbourhoods,
+      minMaxAvgPrice: minMaxAvgPrice[0],
       pagination: {
         currPage: currPage,
         perPage: offset,
