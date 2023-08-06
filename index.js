@@ -1,3 +1,5 @@
+// All the code is written by myself
+
 const express = require('express')
 const dotenv = require('dotenv')
 dotenv.config()

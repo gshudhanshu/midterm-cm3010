@@ -1,3 +1,5 @@
+<!-- All the code is written by myself except pagination -->
+
 <!DOCTYPE html>
 <html>
   <head>
@@ -11,6 +13,7 @@
     <% } else { %> <% var searchUrl = `?search=${encodeURIComponent(search)}` %>
     <div class="container">
       <div class="row gx-4">
+        <!-- Side panel -->
         <div class="col-12 col-md-3">
           <h5 class="card-title">Sort</h5>
           <div class="my-4">
@@ -52,6 +55,7 @@
             <% }) %>
           </div>
         </div>
+        <!-- Listing cards -->
         <div class="col">
           <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3">
             <% listings.forEach(listing => { %>

@@ -1,3 +1,6 @@
+-- All the code is written by myself
+
+
 -- Drop the existing database if it exists
 DROP DATABASE IF EXISTS `listingdb`;
 

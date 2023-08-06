@@ -1,3 +1,5 @@
+// All the code is written by myself
+
 const mysql = require('mysql2/promise')
 
 // Setup MySQL pool connection

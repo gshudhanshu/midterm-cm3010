@@ -1,3 +1,5 @@
+// All the code is written by myself
+
 const fs = require('fs')
 const mysql = require('mysql2')
 
